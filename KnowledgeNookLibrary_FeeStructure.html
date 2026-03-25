@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knowledge Nook Library — Membership Plans</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body{font-family:Arial}.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.6);display:flex;justify-content:center;align-items:center;visibility:hidden;opacity:0;transition:.3s}
+.popup{background:#fff;color:black;padding:25px;width:300px;border-radius:12px;text-align:center;transform:scale(.8);transition:.3s;box-shadow:0 10px 25px rgba(0,0,0,.3)}
+.overlay.active{visibility:visible;opacity:1}.overlay.active .popup{transform:scale(1)}
+button{margin-top:15px;padding:10px 18px;border:none;background:#4CAF50;color:#fff;border-radius:6px;cursor:pointer}
+
+:root{
+  --gold:#c9a84c;--gold-light:#f0cc72;--gold-dim:rgba(201,168,76,0.15);
+  --bg:#07080f;--bg2:#0d0f1a;
+  --card:rgba(255,255,255,0.03);--card-border:rgba(201,168,76,0.18);
+  --text:#e8e4d8;--text-muted:#8a8577;--text-dim:#4a4640;
+  --white:#fff;--green:#4caf7d;--purple:#a78bfa;--radius:20px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;opacity:.5}
+.bg-glow{position:fixed;pointer-events:none;z-index:0;border-radius:50%;filter:blur(130px);opacity:.11}
+.g1{width:650px;height:650px;background:radial-gradient(#c9a84c,transparent);top:-200px;left:-220px}
+.g2{width:520px;height:520px;background:radial-gradient(#3a50c9,transparent);bottom:5%;right:-180px}
+.g3{width:380px;height:380px;background:radial-gradient(#c94468,transparent);top:42%;left:28%}
+.wrap{position:relative;z-index:1;max-width:1300px;margin:0 auto;padding:0 24px 140px}
+
+/* HEADER */
+header{text-align:center;padding:80px 0 52px;animation:fadeDown .9s ease both}
+.logo-badge{display:inline-flex;align-items:center;gap:9px;background:var(--gold-dim);border:1px solid var(--card-border);border-radius:50px;padding:8px 22px;font-size:.78rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:26px}
+h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.8rem,7vw,5.5rem);font-weight:600;line-height:1.05;background:linear-gradient(135deg,#f0cc72 0%,#c9a84c 40%,#eddeb2 72%,#c9a84c 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:16px}
+.subtitle{color:var(--text-muted);font-size:1.05rem;font-weight:300;max-width:460px;margin:0 auto}
+.header-line{width:70px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:26px auto 0}
+
+/* HOURS STRIP */
+.hours-strip{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px 26px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:16px 28px;margin:34px 0 30px;animation:fadeUp .7s .1s ease both}
+.hi{display:flex;align-items:center;gap:8px;font-size:.84rem;color:var(--text-muted)}
+.hi strong{color:var(--text);font-weight:600}
+.hdot{width:5px;height:5px;border-radius:50%;background:var(--gold);opacity:.45}
+
+
+/* TOGGLE */
+.toggle-wrap{display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:40px;animation:fadeUp .7s .15s ease both}
+.toggle-pill{display:inline-flex;background:var(--bg2);border:1px solid rgba(255,255,255,.07);border-radius:60px;padding:5px;gap:3px;flex-wrap:wrap;justify-content:center}
+.toggle-btn{border:none;background:none;color:var(--text-muted);font-family:'Outfit',sans-serif;font-size:.84rem;font-weight:500;padding:10px 20px;border-radius:50px;cursor:pointer;transition:all .25s;white-space:nowrap;line-height:1.3}
+.toggle-btn:hover{color:var(--text)}
+.toggle-btn.active{color:#111;background:linear-gradient(135deg,#f0cc72,#c9a84c);box-shadow:0 4px 18px rgba(201,168,76,.35)}
+.toggle-btn.active .save-tag{background:rgba(0,0,0,.15);color:#333}
+.save-tag{display:inline-block;background:rgba(76,175,125,.16);color:var(--green);font-size:.62rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:20px;margin-left:5px;vertical-align:middle}
+.saving-banner{font-size:.8rem;color:var(--green);opacity:0;transition:opacity .4s;text-align:center;min-height:18px;font-weight:500}
+.saving-banner.show{opacity:1}
+
+/* REG NOTE */
+.reg-inline{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:28px;animation:fadeUp .7s .22s ease both}
+.ri-tag{background:rgba(76,175,125,.09);border:1px solid rgba(76,175,125,.24);border-radius:30px;padding:7px 16px;display:inline-flex;align-items:center;gap:8px;font-size:.82rem;color:var(--text-muted)}
+.ri-tag strong{color:var(--green)}
+
+/* PLANS GRID */
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:20px;margin-bottom:26px;animation:fadeUp .7s .25s ease both}
+.plan-card{position:relative;background:var(--card);border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);padding:30px 24px 26px;display:flex;flex-direction:column;backdrop-filter:blur(10px);transition:transform .35s ease,box-shadow .35s ease,border-color .35s ease;overflow:hidden}
+.plan-card::before{content:'';position:absolute;inset:0;border-radius:var(--radius);background:linear-gradient(145deg,rgba(255,255,255,.04) 0%,transparent 60%);pointer-events:none}
+.plan-card:hover{transform:translateY(-8px);border-color:rgba(201,168,76,.45);box-shadow:0 22px 52px rgba(201,168,76,.11)}
+.plan-card.popular{background:linear-gradient(145deg,rgba(201,168,76,.09),rgba(201,168,76,.02));border-color:rgba(201,168,76,.38)}
+.plan-card.popular:hover{box-shadow:0 22px 52px rgba(201,168,76,.22),0 0 0 1px rgba(201,168,76,.18)}
+.plan-card.premium{background:linear-gradient(145deg,rgba(100,70,210,.1),rgba(150,70,200,.03));border-color:rgba(140,100,230,.28)}
+.plan-card.premium:hover{border-color:rgba(170,130,255,.52);box-shadow:0 22px 52px rgba(120,80,220,.16)}
+
+/* badges */
+.plan-badge{position:absolute;top:16px;right:16px;font-size:.66rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;padding:5px 11px;border-radius:30px}
+.badge-pop{background:linear-gradient(135deg,#f0cc72,#b8892e);color:#111}
+.badge-off{background:linear-gradient(135deg,#a78bfa,#7c3aed);color:#fff}
+
+/* seat urgency */
+.seat-badge{display:inline-flex;align-items:center;gap:6px;font-size:.71rem;background:rgba(255,90,90,.09);border:1px solid rgba(255,90,90,.22);color:#ff7878;border-radius:20px;padding:4px 10px;margin-bottom:12px;width:fit-content}
+.seat-dot{width:6px;height:6px;border-radius:50%;background:#ff7878;animation:blink 1.6s ease infinite;flex-shrink:0}
+.seat-badge.purple-seat{background:rgba(167,139,250,.09);border-color:rgba(167,139,250,.24);color:#c4b0fa}
+.seat-badge.purple-seat .seat-dot{background:#c4b0fa}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* plan info */
+.plan-tier{font-size:.68rem;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px}
+.plan-name{font-family:'Cormorant Garamond',serif;font-size:1.95rem;font-weight:600;color:var(--white);margin-bottom:3px;line-height:1}
+.plan-tagline{font-size:.79rem;color:var(--text-muted);margin-bottom:10px}
+.plan-for{font-size:.78rem;color:var(--gold);background:var(--gold-dim);border-radius:8px;padding:7px 11px;margin-bottom:18px;line-height:1.45;border-left:2px solid var(--gold)}
+
+/* PRICE BOX — new clean format */
+.price-box{background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:16px 18px;margin-bottom:20px}
+.price-row{display:flex;align-items:baseline;gap:3px;margin-bottom:4px}
+.currency{font-size:1.15rem;color:var(--gold);font-weight:600}
+.amount{font-family:'Cormorant Garamond',serif;font-size:2.9rem;font-weight:700;color:var(--white);line-height:1;letter-spacing:-.02em}
+.per{font-size:.8rem;color:var(--text-muted);margin-left:2px}
+.billing-line{font-size:.78rem;color:var(--text-muted);margin-top:3px}
+.billing-line span{color:var(--text);font-weight:600}
+.save-line{margin-top:6px;font-size:.74rem;color:var(--green);font-weight:600;min-height:17px}
+
+/* features */
+.features{list-style:none;flex-grow:1;margin-bottom:20px;display:flex;flex-direction:column;gap:10px}
+.features li{display:flex;align-items:flex-start;gap:10px;font-size:.87rem;color:var(--text);line-height:1.45}
+.feat-icon{font-size:.94rem;margin-top:1px;flex-shrink:0;width:20px;text-align:center}
+
+/* cta buttons */
+.cta-btn{display:block;text-align:center;text-decoration:none;padding:13px 20px;border-radius:12px;font-size:.89rem;font-weight:600;letter-spacing:.02em;transition:all .3s;margin-top:auto}
+.cta-wa{background:rgba(37,211,102,.11);border:1px solid rgba(37,211,102,.26);color:#25d366}
+.cta-wa:hover{background:rgba(37,211,102,.2);border-color:rgba(37,211,102,.48);transform:translateY(-2px)}
+.cta-pop{background:linear-gradient(135deg,#f0cc72,#b8892e);color:#111;border:none;box-shadow:0 8px 24px rgba(201,168,76,.26)}
+.cta-pop:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(201,168,76,.44)}
+.cta-prem{background:linear-gradient(135deg,#a78bfa,#6d28d9);color:#fff;border:none;box-shadow:0 8px 24px rgba(109,40,217,.26)}
+.cta-prem:hover{transform:translateY(-2px);box-shadow:0 14px 36px rgba(109,40,217,.44)}
+
+/* SECTION LABELS */
+.section-label{text-align:center;margin-bottom:34px}
+.section-eyebrow{font-size:.71rem;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.75rem,4vw,2.65rem);font-weight:600;color:var(--white)}
+.section-line{width:46px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:13px auto 0}
+
+/* COMPARISON TABLE */
+.compare-wrap{margin-bottom:68px;animation:fadeUp .7s .38s ease both}
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:16px;border:1px solid rgba(255,255,255,.07)}
+.table-scroll::-webkit-scrollbar{height:4px}
+.table-scroll::-webkit-scrollbar-track{background:var(--bg2)}
+.table-scroll::-webkit-scrollbar-thumb{background:rgba(201,168,76,.3);border-radius:10px}
+.compare-table{width:100%;border-collapse:collapse;min-width:580px}
+.compare-table thead tr{background:rgba(255,255,255,.03)}
+.compare-table thead th{padding:14px 18px;font-size:.71rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);text-align:left;white-space:nowrap}
+.compare-table thead th:not(:first-child){text-align:center}
+.compare-table thead th.cpop{color:var(--gold);background:rgba(201,168,76,.06)}
+.compare-table thead th.cprem{color:var(--purple);background:rgba(167,139,250,.06)}
+.compare-table tbody td{padding:13px 18px;border-top:1px solid rgba(255,255,255,.045);color:var(--text);font-size:.86rem}
+.compare-table tbody td:not(:first-child){text-align:center}
+.compare-table tbody td.cpop{background:rgba(201,168,76,.04)}
+.compare-table tbody td.cprem{background:rgba(167,139,250,.04)}
+.compare-table tbody tr:hover td{background:rgba(255,255,255,.02)}
+.compare-table tbody tr:hover td.cpop{background:rgba(201,168,76,.07)}
+.compare-table tbody tr:hover td.cprem{background:rgba(167,139,250,.07)}
+.td-label{display:flex;align-items:center;gap:9px;color:var(--text-muted);font-weight:500}
+.tick{color:var(--green);font-size:1.05rem}
+.cross{color:var(--text-dim)}
+
+/* TESTIMONIALS */
+.testimonials{margin-bottom:68px;animation:fadeUp .7s .42s ease both}
+.testi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:16px;margin-top:34px}
+.testi-card{background:var(--bg2);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:22px 20px;transition:border-color .3s,transform .3s}
+.testi-card:hover{border-color:rgba(201,168,76,.22);transform:translateY(-4px)}
+.testi-q{font-family:'Cormorant Garamond',serif;font-size:2.4rem;color:var(--gold);opacity:.35;line-height:1;margin-bottom:8px}
+.testi-text{font-size:.87rem;color:var(--text-muted);line-height:1.65;margin-bottom:16px;font-style:italic}
+.testi-author{display:flex;align-items:center;gap:11px}
+.testi-av{width:35px;height:35px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#8b5e20);display:flex;align-items:center;justify-content:center;font-size:.82rem;font-weight:700;color:#111;flex-shrink:0}
+.testi-name{font-size:.84rem;font-weight:600;color:var(--text)}
+.testi-role{font-size:.73rem;color:var(--text-dim)}
+.stars{color:var(--gold);font-size:.8rem;margin-bottom:8px;letter-spacing:1px}
+
+/* AMENITIES */
+.amenities-outer{overflow:hidden;position:relative;margin-bottom:68px}
+.amenities-outer::before,.amenities-outer::after{content:'';position:absolute;top:0;bottom:0;width:90px;z-index:2;pointer-events:none}
+.amenities-outer::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+.amenities-outer::after{right:0;background:linear-gradient(-90deg,var(--bg),transparent)}
+.amenities-track{display:flex;gap:13px;width:max-content;animation:scrollX 34s linear infinite}
+.amenities-track:hover{animation-play-state:paused}
+.amenity-card{flex-shrink:0;width:208px;background:var(--bg2);border:1px solid rgba(255,255,255,.07);border-radius:15px;padding:19px 17px;display:flex;flex-direction:column;gap:9px;transition:border-color .3s,transform .3s}
+.amenity-card:hover{border-color:var(--card-border);transform:translateY(-4px)}
+.amenity-icon{font-size:1.65rem}
+.amenity-card h3{font-size:.87rem;font-weight:600;color:var(--white)}
+.amenity-card p{font-size:.75rem;color:var(--text-muted);line-height:1.4}
+@keyframes scrollX{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+
+/* FOOTER */
+footer{background:var(--bg2);border:1px solid rgba(255,255,255,.06);border-radius:22px;padding:46px 38px 34px;animation:fadeUp .7s .5s ease both}
+footer h2{font-family:'Cormorant Garamond',serif;font-size:1.95rem;color:var(--white);margin-bottom:34px}
+.footer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:32px;margin-bottom:32px}
+.footer-col label{display:block;font-size:.67rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);margin-bottom:11px}
+.footer-col p{color:var(--text-muted);font-size:.85rem;line-height:1.72}
+.footer-col a{color:var(--text);text-decoration:none;display:block;font-size:.85rem;line-height:1.9;transition:color .2s}
+.footer-col a:hover{color:var(--gold-light)}
+.map-link{display:inline-flex !important;align-items:center;gap:6px;margin-top:10px;font-size:.77rem;color:var(--gold) !important;border:1px solid rgba(201,168,76,.25);padding:5px 12px;border-radius:20px;transition:all .2s !important;line-height:1 !important}
+.map-link:hover{background:var(--gold-dim);border-color:var(--gold)}
+.footer-divider{border:none;border-top:1px solid rgba(255,255,255,.06);margin-bottom:20px}
+.footer-bottom{display:flex;justify-content:space-between;align-items:center;font-size:.75rem;color:var(--text-dim);flex-wrap:wrap;gap:10px}
+
+/* FLOAT BTN */
+.float-btn{position:fixed;bottom:28px;right:28px;z-index:999;display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#f0cc72,#b8892e);color:#111;text-decoration:none;font-weight:700;font-size:.83rem;padding:13px 23px;border-radius:50px;box-shadow:0 8px 26px rgba(201,168,76,.4);transition:all .3s;animation:pbtn 2.5s ease-in-out infinite}
+.float-btn:hover{transform:translateY(-4px);box-shadow:0 14px 40px rgba(201,168,76,.55);animation:none}
+@keyframes pbtn{0%,100%{box-shadow:0 8px 26px rgba(201,168,76,.4)}50%{box-shadow:0 8px 42px rgba(201,168,76,.7)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:700px){
+  header{padding:50px 0 36px}
+  .plans-grid{grid-template-columns:1fr}
+  footer{padding:32px 20px 26px}
+  .float-btn{padding:11px 17px;font-size:.77rem;bottom:16px;right:16px}
+  .hours-strip{gap:8px 16px;padding:13px 16px}
+  .toggle-pill{border-radius:16px;padding:4px}
+  .toggle-btn{padding:9px 13px;font-size:.79rem}
+}
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(201,168,76,.28);border-radius:10px}
+</style>
+</head>
+<body>
+
+<div class="bg-glow g1"></div>
+<div class="bg-glow g2"></div>
+<div class="bg-glow g3"></div>
+
+<div class="wrap">
+
+<!-- HEADER -->
+<header>
+  <div class="logo-badge"><span>📚</span> Patna, Bihar · Est. 2024</div>
+  <h1>Knowledge Nook<br>Library</h1>
+  <p class="subtitle">Premium study spaces designed for focused minds.<br>Choose the plan that fits your journey.</p>
+  <div class="header-line"></div>
+</header>
+
+<!-- Alert -->
+<div id="o" class="overlay"><div class="popup">
+<h2>Welcome 👋</h2><p>Plans, prices and facilities may be updated after this page was created. Call or WhatsApp us to verify the latest details before joining.
+
+!</p>
+<button onclick="c()">Continue</button>
+</div></div>
+
+<!-- LIBRARY HOURS -->
+<div class="hours-strip">
+  <div class="hi"><span>🕕</span><span><strong>Library Hours</strong></span></div>
+  <div class="hdot"></div>
+  <div class="hi"><span>🌅</span><span>Opens at <strong>6:00 AM</strong></span></div>
+  <div class="hdot"></div>
+  <div class="hi"><span>🌙</span><span>Closes at <strong>11:00 PM</strong></span></div>
+  <div class="hi"><span>🌙</span><span><strong>Night Shift</strong></span></div>
+  <div class="hdot"></div>
+  <div class="hi"><span>📅</span><span><strong>Open 7 days</strong>, including Sundays</span></div>
+</div>
+
+
+<!-- REG FEE
+<div class="reg-inline">
+  <div class="ri-tag">✅ <strong>One-time Registration Fee: ₹100</strong> &nbsp;·&nbsp; No hidden charges. Ever.</div>
+</div> -->
+<!-- TOGGLE -->
+<div class="toggle-wrap">
+  <div class="toggle-pill">
+    <button class="toggle-btn active" id="btn-monthly"      onclick="setDur('monthly')">Monthly</button>
+    <button class="toggle-btn"        id="btn-quarterly"    onclick="setDur('quarterly')">Quarterly <span class="save-tag">Save 20%</span></button>
+    <button class="toggle-btn"        id="btn-half-yearly"  onclick="setDur('half-yearly')">Half-Yearly <span class="save-tag">Save 23%</span></button>
+    <button class="toggle-btn"        id="btn-yearly"       onclick="setDur('yearly')">Yearly <span class="save-tag">Best Deal</span></button>
+  </div>
+  <div class="saving-banner" id="savBanner">🎉 You save ₹<span id="savAmt">0</span> compared to paying monthly!</div>
+</div>
+
+<!-- PLANS GRID -->
+<div class="plans-grid">
+  <!-- BASIC -->
+  <div class="plan-card">
+    <div class="plan-tier">Plan 01</div>
+    <div class="plan-name">Basic</div>
+    <div class="plan-tagline">Morning or Evening Slot · 6 Hrs</div>
+    <div class="plan-for">💡 Best for: School &amp; college students who study in short, fixed daily slots.</div>
+    <div class="seat-badge"><span class="seat-dot"></span> Hall 01 · 77 Seats</div>
+    <div class="price-box">
+      <div class="price-row">
+        <span class="currency">₹</span><span class="amount" id="ba">500</span><span class="per">/month</span>
+      </div>
+      <div class="billing-line" id="bb">Billed <span>monthly</span></div>
+      <div class="save-line" id="bs">&nbsp;</div>
+    </div>
+    <ul class="features">
+      <li><span class="feat-icon">⏱️</span><span>6 Hours — Morning or Evening slot</span></li>
+      <li><span class="feat-icon">🏛️</span><span>Hall 01 · 77 seats</span></li>
+      <li><span class="feat-icon">🖨️</span><span>10 free printout pages/month</span></li>
+      <li><span class="feat-icon">📰</span><span>Daily newspapers (English &amp; Hindi)</span></li>
+      <li><span class="feat-icon">📶</span><span>High-speed Wi-Fi included</span></li>
+    </ul>
+    <a href="https://wa.me/917903547986?text=Hi, I am interested in the Basic Plan at Knowledge Nook Library." class="cta-btn cta-wa" target="_blank">💬 Enquire on WhatsApp</a>
+  </div>
+
+  <!-- FUNDAMENTAL -->
+  <div class="plan-card">
+    <div class="plan-tier">Plan 02</div>
+    <div class="plan-name">Fundamental</div>
+    <div class="plan-tagline">Fixed Afternoon · 12 PM – 6 PM</div>
+    <div class="plan-for">💡 Best for: Students who prefer a consistent afternoon study schedule every day.</div>
+    <div class="seat-badge"><span class="seat-dot"></span> Hall 01 · 77 Seats</div>
+    <div class="price-box">
+      <div class="price-row">
+        <span class="currency">₹</span><span class="amount" id="fa">600</span><span class="per">/month</span>
+      </div>
+      <div class="billing-line" id="fb">Billed <span>monthly</span></div>
+      <div class="save-line" id="fs">&nbsp;</div>
+    </div>
+    <ul class="features">
+      <li><span class="feat-icon">⏱️</span><span>6 Hours — fixed 12 PM to 6 PM daily</span></li>
+      <li><span class="feat-icon">🏛️</span><span>Hall 01 · 77 seats</span></li>
+      <li><span class="feat-icon">🖨️</span><span>10 free printout pages/month</span></li>
+      <li><span class="feat-icon">📰</span><span>Daily newspapers (English &amp; Hindi)</span></li>
+      <li><span class="feat-icon">📶</span><span>High-speed Wi-Fi included</span></li>
+    </ul>
+    <a href="https://wa.me/917903547986?text=Hi, I am interested in the Fundamental Plan at Knowledge Nook Library." class="cta-btn cta-wa" target="_blank">💬 Enquire on WhatsApp</a>
+  </div>
+
+  <!-- STANDARD -->
+  <div class="plan-card popular">
+    <div class="plan-badge badge-pop">⭐ Most Popular</div>
+    <div class="plan-tier">Plan 03</div>
+    <div class="plan-name">Standard</div>
+    <div class="plan-tagline">Full Day Access · Maximum Flexibility</div>
+    <div class="plan-for">💡 Best for: UPSC &amp; competitive exam aspirants needing long, uninterrupted daily study hours.</div>
+    <div class="seat-badge"><span class="seat-dot"></span> Hall 01 or 02 · 33 Seats</div>
+    <div class="price-box">
+      <div class="price-row">
+        <span class="currency">₹</span><span class="amount" id="sa">1,000</span><span class="per">/month</span>
+      </div>
+      <div class="billing-line" id="sb">Billed <span>monthly</span></div>
+      <div class="save-line" id="ss">&nbsp;</div>
+    </div>
+    <ul class="features">
+      <li><span class="feat-icon">⏱️</span><span>12 Hours daily — come at any time</span></li>
+      <li><span class="feat-icon">🏛️</span><span>Hall 01 (77 seats) or Hall 02 (33 seats)</span></li>
+      <li><span class="feat-icon">🖨️</span><span>25 free printout pages/month</span></li>
+      <li><span class="feat-icon">📰</span><span>Daily newspapers (English &amp; Hindi)</span></li>
+      <li><span class="feat-icon">📶</span><span>High-speed Wi-Fi included</span></li>
+    </ul>
+    <a href="https://wa.me/917903547986?text=Hi, I am interested in the Standard Plan at Knowledge Nook Library." class="cta-btn cta-pop" target="_blank">✦ Get This Plan</a>
+  </div>
+
+  <!-- PROFESSIONAL -->
+  <div class="plan-card premium">
+    <div class="plan-badge badge-off">🎖 Officer's</div>
+    <div class="plan-tier">Plan 04</div>
+    <div class="plan-name">Professional</div>
+    <div class="plan-tagline">Quiet Hall · Minimum Distraction</div>
+    <div class="plan-for">💡 Best for: Serious civil service aspirants who need a calm, low-density space with unlimited time.</div>
+    <div class="seat-badge purple-seat"><span class="seat-dot"></span> Hall 03 or 04 · Only 20 Seats</div>
+    <div class="price-box">
+      <div class="price-row">
+        <span class="currency">₹</span><span class="amount" id="pa">1,400</span><span class="per">/month</span>
+      </div>
+      <div class="billing-line" id="pb">Billed <span>monthly</span></div>
+      <div class="save-line" id="ps">&nbsp;</div>
+    </div>
+    <ul class="features">
+      <li><span class="feat-icon">⏱️</span><span>Unlimited hours — no daily time cap</span></li>
+      <li><span class="feat-icon">🏛️</span><span>Hall 03 or 04 · Only 20 seats (quiet &amp; calm)</span></li>
+      <li><span class="feat-icon">🖨️</span><span>25 free printout pages/month</span></li>
+      <li><span class="feat-icon">📰</span><span>Daily newspapers (English &amp; Hindi)</span></li>
+      <li><span class="feat-icon">📶</span><span>High-speed Wi-Fi included</span></li>
+    </ul>
+    <a href="https://wa.me/917903547986?text=Hi, I am interested in the Professional Plan at Knowledge Nook Library." class="cta-btn cta-prem" target="_blank">✦ Get This Plan</a>
+  </div>
+
+</div><!-- /plans-grid -->
+
+<!-- QUICK COMPARISON TABLE -->
+<div class="compare-wrap">
+  <div class="section-label">
+    <div class="section-eyebrow">Side-by-side</div>
+    <div class="section-title">Quick Comparison</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="table-scroll">
+    <table class="compare-table">
+      <thead>
+        <tr>
+          <th style="min-width:155px">Feature</th>
+          <th>Basic</th>
+          <th>Fundamental</th>
+          <th class="cpop">Standard ⭐</th>
+          <th class="cprem">Professional 🎖</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="td-label">⏱️ Hours/Day</span></td><td>6 hrs</td><td>6 hrs</td><td class="cpop">12 hrs</td><td class="cprem">Unlimited</td></tr>
+        <tr><td><span class="td-label">🕐 Time Slot</span></td><td>Flexible</td><td>12–6 PM only</td><td class="cpop">Any time</td><td class="cprem">Any time</td></tr>
+        <tr><td><span class="td-label">🏛️ Hall</span></td><td>Hall 01</td><td>Hall 01</td><td class="cpop">Hall 01 or 02</td><td class="cprem">Hall 03 or 04</td></tr>
+        <tr><td><span class="td-label">💺 Capacity</span></td><td>77 seats</td><td>77 seats</td><td class="cpop">77 / 33 seats</td><td class="cprem" style="color:var(--purple);font-weight:600">Only 20 seats</td></tr>
+        <tr><td><span class="td-label">🖨️ Printouts/mo</span></td><td>10 pages</td><td>10 pages</td><td class="cpop">25 pages</td><td class="cprem">25 pages</td></tr>
+        <tr><td><span class="td-label">📰 Newspapers</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td class="cpop"><span class="tick">✓</span></td><td class="cprem"><span class="tick">✓</span></td></tr>
+        <tr><td><span class="td-label">📶 Wi-Fi</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td class="cpop"><span class="tick">✓</span></td><td class="cprem"><span class="tick">✓</span></td></tr>
+        <tr><td><span class="td-label">❄️ AC</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td class="cpop"><span class="tick">✓</span></td><td class="cprem"><span class="tick">✓</span></td></tr>
+        <tr><td><span class="td-label">💧 RO Water</span></td><td><span class="tick">✓</span></td><td><span class="tick">✓</span></td><td class="cpop"><span class="tick">✓</span></td><td class="cprem"><span class="tick">✓</span></td></tr>
+        <tr>
+          <td><span class="td-label">🏷️ Monthly Rate</span></td>
+          <td>₹500</td><td>₹600</td>
+          <td class="cpop" style="color:var(--gold);font-weight:700">₹1,000</td>
+          <td class="cprem" style="color:var(--purple);font-weight:700">₹1,400</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- TESTIMONIALS -->
+<div class="testimonials">
+  <div class="section-label">
+    <div class="section-eyebrow">What members say</div>
+    <div class="section-title">Real Reviews</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <div class="testi-q">"</div>
+      
+      <p class="testi-text">Best result oriented libray of phulwari Sharif ,guys hme to is library ka amenties bahut accha laga but Mera yaha aane ka maksad  library is area ka most result oriented libray hai
+.</p>
+        <div class="testi-av">DJ</div>
+        <div><div class="testi-name">Deepak Jha</div><div class="testi-role">BPSC Aspirant · Professional Plan</div></div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">★★★★★</div>
+      <div class="testi-q">"</div>
+      <p class="testi-text">This library excels with its fast WiFi, peaceful study environment, and excellent hygiene, making it a top choice. Compared to my past experiences elsewhere, which were often marred by poor management and lack of cleanliness, this place is a huge improvement and provides a much higher quality experience.</p>
+      <div class="testi-author">
+        <div class="testi-av">AH</div>
+        <div><div class="testi-name">Aisha Hussain</div><div class="testi-role">College Student · Fundamental Plan</div></div>
+      </div>
+    </div>
+    <div class="testi-card">
+      <div class="stars">★★★★☆</div>
+      <div class="testi-q">"</div>
+      <p class="testi-text">Very peaceful environment, best library service for those students who are willing to passionate about his preparation at very reasonable cost! you can take advantage at this vicinity 😊📚📖📝 …
+
+
+
+
+</p>
+      <div class="testi-author">
+        <div class="testi-av">S</div>
+        <div><div class="testi-name">Saanu</div><div class="testi-role">SSC CGL Aspirant · Standard Plan</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AMENITIES -->
+<div class="section-label">
+  <div class="section-eyebrow">Included with every plan</div>
+  <div class="section-title">What We Offer</div>
+  <div class="section-line"></div>
+</div>
+<div class="amenities-outer">
+  <div class="amenities-track">
+    <div class="amenity-card"><div class="amenity-icon">📶</div><h3>High-Speed Wi-Fi</h3><p>Fast internet for all devices</p></div>
+    <div class="amenity-card"><div class="amenity-icon">❄️</div><h3>Climate Control</h3><p>Fully air-conditioned halls</p></div>
+    <div class="amenity-card"><div class="amenity-icon">🛡️</div><h3>CCTV Security</h3><p>24/7 surveillance for safety</p></div>
+    <div class="amenity-card"><div class="amenity-icon">💡</div><h3>Desk Lights</h3><p>Individual study lighting</p></div>
+    <div class="amenity-card"><div class="amenity-icon">💧</div><h3>RO Water</h3><p>Chilled, hot &amp; normal water</p></div>
+    <div class="amenity-card"><div class="amenity-icon">📰</div><h3>Daily Newspapers</h3><p>English &amp; Hindi, every day</p></div>
+    <div class="amenity-card"><div class="amenity-icon">🚽</div><h3>Separate Washrooms</h3><p>Hygienic, gender-separate</p></div>
+    <div class="amenity-card"><div class="amenity-icon">🖨️</div><h3>Print-Out Facility</h3><p>On-site printing service</p></div>
+    <div class="amenity-card"><div class="amenity-icon">🤝</div><h3>Collaboration Zones</h3><p>Group discussion areas</p></div>
+    <!-- duplicate for loop -->
+    <div class="amenity-card"><div class="amenity-icon">📶</div><h3>High-Speed Wi-Fi</h3><p>Fast internet for all devices</p></div>
+    <div class="amenity-card"><div class="amenity-icon">❄️</div><h3>Climate Control</h3><p>Fully air-conditioned halls</p></div>
+    <div class="amenity-card"><div class="amenity-icon">🛡️</div><h3>CCTV Security</h3><p>24/7 surveillance for safety</p></div>
+    <div class="amenity-card"><div class="amenity-icon">💡</div><h3>Desk Lights</h3><p>Individual study lighting</p></div>
+    <div class="amenity-card"><div class="amenity-icon">💧</div><h3>RO Water</h3><p>Chilled, hot &amp; normal water</p></div>
+    <div class="amenity-card"><div class="amenity-icon">📰</div><h3>Daily Newspapers</h3><p>English &amp; Hindi, every day</p></div>
+    <div class="amenity-card"><div class="amenity-icon">🚽</div><h3>Separate Washrooms</h3><p>Hygienic, gender-separate</p></div>
+    <div class="amenity-card"><div class="amenity-icon">🖨️</div><h3>Print-Out Facility</h3><p>On-site printing service</p></div>
+    <div class="amenity-card"><div class="amenity-icon">🤝</div><h3>Collaboration Zones</h3><p>Group discussion areas</p></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <h2>Get in Touch</h2>
+  <div class="footer-grid">
+    <div class="footer-col">
+      <label>📍 Visit Us</label>
+      <p>BMP 16, Prakash Colony<br>Maulana Azad Nagar, Patna<br>Bihar 801105</p>
+      <a href="https://www.google.com/maps/place/Knowledge+Nook+library/@25.5770511,85.0559126,17z/data=!3m1!4b1!4m6!3m5!1s0x39ed5702dbaafced:0x1c743a750c49f75e!8m2!3d25.5770463!4d85.0584875!16s%2Fg%2F11sjxlnb16?entry=ttu&g_ep=EgoyMDI2MDMyMi4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="map-link">🗺️ Open in Google Maps</a>
+    </div>
+    <div class="footer-col">
+      <label>📞 Call / WhatsApp</label>
+      <a href="tel:+917903547986">+91 79035 47986</a>
+      <a href="tel:+918102003094">+91 81020 03094</a>
+      <a href="https://wa.me/918102003094?text=Hi, I want to know about Knowledge Nook Library membership." target="_blank" style="color:#25d366;margin-top:8px">💬 Chat on WhatsApp</a>
+    </div>
+    <div class="footer-col">
+      <label>📧 Email</label>
+      <a href="mailto:knowledgenooklibrary@gmail.com">knowledgenooklibrary<br>@gmail.com</a>
+    </div>
+    <div class="footer-col">
+      <label>🌐 Website</label>
+      <a href="https://knlibrary.netlify.app/" target="_blank">knlibrary.netlify.app</a>
+      <p style="margin-top:8px;font-size:.75rem;color:var(--text-dim)">Visit for the latest updates</p>
+    </div>
+  </div>
+  <hr class="footer-divider">
+  <div class="footer-bottom">
+    <span>© 2026 Knowledge Nook Library. All rights reserved.</span>
+    <span>Designed for focused minds ✦</span>
+  </div>
+</footer>
+
+</div><!-- /wrap -->
+<a href="https://knlibrary.netlify.app/" class="float-btn" target="_blank">🌐 Visit Website</a>
+
+<script>
+// Pricing: [monthly-rate (number), billing-label, annual-equivalent (number)]
+// yearly plan shows the "best deal" yearly rate
+var PLANS = {
+  basic: {
+    monthly:      { rate: 500,   label: 'monthly',               annual: 500*12   },
+    quarterly:    { rate: 399,   label: 'quarterly',              annual: 399*12   },
+    'half-yearly':{ rate: 383,   label: 'half-yearly',            annual: 383*12   },
+    yearly:       { rate: 383,   label: 'yearly  —  Best Deal: ₹4,600/yr', annual: 4600 }
+  },
+  fundamental: {
+    monthly:      { rate: 600,   label: 'monthly',               annual: 600*12   },
+    quarterly:    { rate: 499,   label: 'quarterly',              annual: 499*12   },
+    'half-yearly':{ rate: 466,   label: 'half-yearly',            annual: 466*12   },
+    yearly:       { rate: 466,   label: 'yearly  —  Best Deal: ₹5,600/yr', annual: 5600 }
+  },
+  standard: {
+    monthly:      { rate: 1000,  label: 'monthly',               annual: 1000*12  },
+    quarterly:    { rate: 833,   label: 'quarterly',              annual: 833*12   },
+    'half-yearly':{ rate: 800,   label: 'half-yearly',            annual: 800*12   },
+    yearly:       { rate: 779,   label: 'yearly  —  Best Deal: ₹9,348/yr', annual: 9348 }
+  },
+  professional: {
+    monthly:      { rate: 1400,  label: 'monthly',               annual: 1400*12  },
+    quarterly:    { rate: 1196,  label: 'quarterly',              annual: 1196*12  },
+    'half-yearly':{ rate: 1150,  label: 'half-yearly',            annual: 1150*12  },
+    yearly:       { rate: 1122,  label: 'yearly  —  Best Deal: ₹13,464/yr', annual: 13464 }
+  }
+};
+
+var BASE_ANNUAL = { basic:500*12, fundamental:600*12, standard:1000*12, professional:1400*12 };
+
+// Maps: [planKey, amountId, billingId, saveId]
+var MAP = [
+  ['basic',        'ba','bb','bs'],
+  ['fundamental',  'fa','fb','fs'],
+  ['standard',     'sa','sb','ss'],
+  ['professional', 'pa','pb','ps']
+];
+
+function fmt(n) {
+  return n.toLocaleString('en-IN');
+}
+
+function setDur(dur) {
+  // update buttons
+  ['monthly','quarterly','half-yearly','yearly'].forEach(function(d) {
+    var el = document.getElementById('btn-' + d);
+    if (el) el.classList.toggle('active', d === dur);
+  });
+
+  var totalSaving = 0;
+
+  MAP.forEach(function(row) {
+    var key = row[0], aId = row[1], bId = row[2], sId = row[3];
+    var p = PLANS[key][dur];
+
+    var aEl = document.getElementById(aId);
+    var bEl = document.getElementById(bId);
+    var sEl = document.getElementById(sId);
+
+    if (!aEl || !bEl || !sEl) return;
+
+    // animate amount
+    aEl.animate(
+      [{opacity:0, transform:'translateY(-10px)'},{opacity:1, transform:'translateY(0)'}],
+      {duration:300, easing:'ease', fill:'forwards'}
+    );
+    aEl.textContent = fmt(p.rate);
+
+    // billing line: "Billed <strong>quarterly</strong>"
+    bEl.innerHTML = 'Billed &nbsp;<span>' + p.label + '</span>';
+
+    // per-card saving
+    var saving = BASE_ANNUAL[key] - p.annual;
+    if (dur !== 'monthly' && saving > 0) {
+      sEl.textContent = '🎉 Save ₹' + fmt(saving) + ' vs monthly';
+      totalSaving += saving;
+    } else {
+      sEl.innerHTML = '&nbsp;';
+    }
+  });
+
+  // top banner
+  var banner = document.getElementById('savBanner');
+  if (dur !== 'monthly' && totalSaving > 0) {
+    document.getElementById('savAmt').textContent = fmt(totalSaving);
+    banner.classList.add('show');
+  } else {
+    banner.classList.remove('show');
+  }
+}
+// Alert popup with 5 sec delay
+window.onload=()=>setTimeout(()=>o.classList.add("active"),5000);
+function c(){o.classList.remove("active")}
+o.onclick=e=>{if(e.target===o)c()}
+</script>
+</body>
+</html>
