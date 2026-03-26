@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — Knowledge Nook Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --saffron:#F97316;--saffron-light:#FEF3E7;--saffron-glow:rgba(249,115,22,.14);
+  --navy:#0F172A;--navy-mid:#1E3A5F;--navy-soft:#334155;
+  --emerald:#059669;--emerald-bg:rgba(5,150,105,.09);
+  --bg:#FDFCF8;--bg2:#F9F7F3;
+  --white:#FFFFFF;--border:#E8E3D9;--border-mid:#D4CEC3;
+  --text:#1A1309;--text-mid:#4A4036;--text-soft:#8A7D6E;
+  --radius:20px;--card-shadow:0 1px 3px rgba(0,0,0,.06),0 8px 32px rgba(0,0,0,.07);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow-x:hidden}
+
+/* BG PATTERN */
+body::before{content:'';position:fixed;inset:0;z-index:0;background-image:radial-gradient(circle at 18% 20%, rgba(249,115,22,.055) 0%, transparent 42%),radial-gradient(circle at 82% 78%, rgba(124,58,237,.05) 0%, transparent 40%),radial-gradient(circle at 50% 50%, rgba(217,119,6,.03) 0%, transparent 60%);pointer-events:none}
+
+.auth-wrap{position:relative;z-index:1;width:100%;max-width:440px;padding:40px 24px;animation:fadeUp .7s ease both}
+.auth-header{text-align:center;margin-bottom:32px}
+.logo-badge{display:inline-flex;align-items:center;gap:8px;background:var(--saffron-light);border:1.5px solid rgba(249,115,22,.28);border-radius:50px;padding:6px 16px;font-size:.7rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--saffron);margin-bottom:16px;text-decoration:none;transition:all .3s}
+.logo-badge:hover{background:var(--saffron-glow)}
+h1{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:var(--navy);margin-bottom:8px}
+.subtitle{color:var(--text-soft);font-size:.95rem;line-height:1.5}
+.auth-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:40px 32px;box-shadow:var(--card-shadow);position:relative;overflow:hidden}
+.auth-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--saffron),#FBBF24)}
+.divider{display:flex;align-items:center;text-align:center;margin:26px 0;color:var(--text-soft);font-size:.75rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.divider::before, .divider::after{content:'';flex:1;border-bottom:1.5px solid var(--border)}
+.divider span{padding:0 14px}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:.82rem;font-weight:600;color:var(--navy-mid);margin-bottom:8px}
+.form-control{width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:13px 16px;font-family:'DM Sans',sans-serif;font-size:.95rem;color:var(--navy);transition:all .3s;outline:none}
+.form-control::placeholder{color:var(--text-soft);opacity:.6}
+.form-control:focus{background:var(--white);border-color:var(--saffron);box-shadow:0 0 0 4px var(--saffron-glow)}
+.submit-btn{display:block;width:100%;background:var(--navy);color:#fff;border:none;padding:15px;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.02em;cursor:pointer;transition:all .3s;box-shadow:0 6px 20px rgba(15,23,42,.2)}
+.submit-btn:hover{transform:translateY(-2px);background:var(--navy-mid);box-shadow:0 12px 32px rgba(15,23,42,.3)}
+.auth-footer{text-align:center;margin-top:24px;font-size:.85rem;color:var(--text-mid)}
+.auth-footer a{color:var(--saffron);font-weight:700;text-decoration:none;transition:color .2s}
+.auth-footer a:hover{color:#EA580C;text-decoration:underline}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:500px){ .auth-card{padding:32px 24px} }
+</style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+
+<div class="auth-wrap">
+  <div class="auth-header">
+    <a href="Index.html" class="logo-badge">← Back to Home</a>
+    <h1>Welcome Back</h1>
+    <p class="subtitle">Log in to your library account.</p>
+  </div>
+
+  <div class="auth-card">
+    <div id="googleSignInDiv" style="display: flex; justify-content: center; width: 100%; margin-bottom: 26px;"></div>
+
+    <div class="divider"><span>Or log in with email</span></div>
+
+    <div id="step1">
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" class="form-control" placeholder="your@email.com" required>
+      </div>
+      <button type="button" class="submit-btn" id="sendOtpBtn">Send OTP</button>
+    </div>
+
+    <div id="step2" style="display: none;">
+      <p style="font-size: 0.85rem; color: var(--emerald); margin-bottom: 12px; font-weight: 600;">✅ OTP sent to your email!</p>
+      <div class="form-group">
+        <label for="otp">Enter 6-Digit OTP</label>
+        <input type="text" id="otp" class="form-control" placeholder="••••••" maxlength="6" required>
+      </div>
+      <button type="button" class="submit-btn" id="verifyOtpBtn">Verify & Log In</button>
+      <button type="button" style="background:none; border:none; color:var(--text-soft); font-size:0.8rem; margin-top:12px; cursor:pointer; width:100%; text-decoration:underline;" onclick="location.reload()">Back to Email</button>
+    </div>
+
+    <div class="auth-footer">
+      Don't have an account? <a href="RegisterPage.HTML">Sign up here</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Google Script URL
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyPbbY-KLAk0bdePtwIPCLIj6jMW9UzqQi-en_Y-ZcJrnoIyZ3jUh7OR4CAWb6YwN28/exec';
+
+  // --- STEP 1: SEND OTP ---
+  document.getElementById('sendOtpBtn').addEventListener('click', function() {
+    const email = document.getElementById('email').value.trim();
+    if (!email) { alert("Please enter your email."); return; }
+
+    const btn = document.getElementById('sendOtpBtn');
+    btn.textContent = "Sending..."; btn.disabled = true; btn.style.opacity = "0.7";
+
+    const formData = new FormData();
+    formData.append('action', 'request_otp');
+    formData.append('email', email);
+
+    fetch(scriptURL, { method: 'POST', body: formData })
+      .then(res => res.json())
+      .then(data => {
+        if (data.result === 'success') {
+          document.getElementById('step1').style.display = 'none';
+          document.getElementById('step2').style.display = 'block';
+        } else {
+          alert(data.message);
+          btn.textContent = "Send OTP"; btn.disabled = false; btn.style.opacity = "1";
+        }
+      })
+      .catch(err => {
+        alert("Network error. Please try again.");
+        btn.textContent = "Send OTP"; btn.disabled = false; btn.style.opacity = "1";
+      });
+  });
+
+  // --- STEP 2: VERIFY OTP ---
+  document.getElementById('verifyOtpBtn').addEventListener('click', function() {
+    const email = document.getElementById('email').value.trim();
+    const otp = document.getElementById('otp').value.trim();
+    if (otp.length !== 6) { alert("Please enter the 6-digit OTP."); return; }
+
+    const btn = document.getElementById('verifyOtpBtn');
+    btn.textContent = "Verifying..."; btn.disabled = true; btn.style.opacity = "0.7";
+
+    const formData = new FormData();
+    formData.append('action', 'verify_otp');
+    formData.append('email', email);
+    formData.append('otp', otp);
+
+    fetch(scriptURL, { method: 'POST', body: formData })
+      .then(res => res.json())
+      .then(data => {
+        if (data.result === 'success') {
+          localStorage.setItem('kn_user_name', data.name);
+          localStorage.setItem('kn_user_email', data.email);
+          localStorage.setItem('kn_user_plan', data.plan);
+          window.location.href = "dashboard.html";
+        } else {
+          alert(data.message);
+          btn.textContent = "Verify & Log In"; btn.disabled = false; btn.style.opacity = "1";
+        }
+      })
+      .catch(err => {
+        alert("Network error. Please try again.");
+        btn.textContent = "Verify & Log In"; btn.disabled = false; btn.style.opacity = "1";
+      });
+  });
+
+  // --- GOOGLE SIGN IN LOGIC ---
+
+  function decodeJwtResponse(token) {
+    let base64Url = token.split('.')[1];
+    let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
+    return JSON.parse(jsonPayload);
+  }
+
+  function handleCredentialResponse(response) {
+    const responsePayload = decodeJwtResponse(response.credential);
+    const userName = responsePayload.name;
+    const userEmail = responsePayload.email;
+
+    const formData = new FormData();
+    formData.append('action', 'google_login');
+    formData.append('email', userEmail);
+    formData.append('name', userName);
+
+    fetch(scriptURL, { method: 'POST', body: formData })
+      .then(res => res.json())
+      .then(data => {
+        if (data.result === 'success') {
+          localStorage.setItem('kn_user_name', data.name);
+          localStorage.setItem('kn_user_email', data.email);
+          localStorage.setItem('kn_user_plan', data.plan);
+          window.location.href = "dashboard.html";
+        } else {
+          alert("Error logging in: " + data.message);
+        }
+      })
+      .catch(err => {
+        alert("Network error connecting to the database.");
+      });
+  }
+
+  window.onload = function () {
+    google.accounts.id.initialize({
+      // PUT YOUR CLIENT ID HERE:
+      client_id: "873082059494-c2aehijj4ipm33h64uqrdp9ddsn8b15o.apps.googleusercontent.com", 
+      callback: handleCredentialResponse
+    });
+    
+    google.accounts.id.renderButton(
+      document.getElementById("googleSignInDiv"),
+      { theme: "outline", size: "large", width: "100%", shape: "rectangular", text: "continue_with" }  
+    );
+  };
+</script>
+
+</body>
+</html>

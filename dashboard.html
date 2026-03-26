@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Dashboard — Knowledge Nook Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --saffron:#F97316;--saffron-light:#FEF3E7;--saffron-glow:rgba(249,115,22,.14);
+  --navy:#0F172A;--navy-mid:#1E3A5F;--navy-soft:#334155;
+  --emerald:#059669;--emerald-bg:rgba(5,150,105,.09);
+  --bg:#FDFCF8;--bg2:#F9F7F3;
+  --white:#FFFFFF;--border:#E8E3D9;--border-mid:#D4CEC3;
+  --text:#1A1309;--text-mid:#4A4036;--text-soft:#8A7D6E;
+  --radius:20px;--shadow:0 1px 3px rgba(0,0,0,.05),0 8px 28px rgba(0,0,0,.07);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+
+/* NAVIGATION */
+.navbar{position:sticky;top:0;z-index:200;background:rgba(253,252,248,.92);backdrop-filter:blur(14px);border-bottom:1.5px solid var(--border);padding:0 28px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;height:64px}
+.nav-brand{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--navy);text-decoration:none}
+.nav-brand em{color:var(--saffron);font-style:normal}
+.nav-center{display:flex;align-items:center;gap:4px;justify-content:center}
+.nav-link{text-decoration:none;color:var(--text-soft);font-size:.84rem;font-weight:500;padding:7px 14px;border-radius:10px;transition:all .2s;white-space:nowrap}
+.nav-link:hover{background:var(--bg2);color:var(--navy)}
+.nav-link.active{background:var(--navy);color:#fff;font-weight:600}
+.nav-right{display:flex;align-items:center;gap:12px}
+.user-pill{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1.5px solid var(--border);border-radius:50px;padding:5px 14px 5px 5px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--saffron),#D97706);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem}
+.logout-btn{border:1.5px solid var(--border);background:none;color:var(--text-soft);padding:7px 14px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.83rem;cursor:pointer;transition:all .2s}
+.logout-btn:hover{background:rgba(220,38,38,.07);border-color:#DC2626;color:#DC2626}
+
+/* MAIN LAYOUT */
+.container{max-width:1100px;margin:0 auto;padding:40px 24px;animation:fadeUp .7s ease both}
+.page-header{margin-bottom:32px}
+.page-header h1{font-family:'Playfair Display',serif;font-size:2.4rem;color:var(--navy);margin-bottom:8px}
+.grid-layout{display:grid;grid-template-columns:2.5fr 1fr;gap:24px}
+
+/* CARDS */
+.card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow)}
+.card-title{font-size:.85rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-soft);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+
+/* PLAN HERO */
+.plan-hero{background:linear-gradient(135deg,var(--navy),var(--navy-mid));border-radius:16px;padding:32px;color:var(--white);position:relative;overflow:hidden;margin-bottom:24px}
+.status-badge{display:inline-block;background:rgba(16,185,129,.2);color:#34D399;font-size:.75rem;font-weight:700;padding:4px 12px;border-radius:20px;letter-spacing:.05em;margin-bottom:12px;border:1px solid rgba(52,211,153,.3)}
+.plan-name{font-family:'Playfair Display',serif;font-size:2.2rem;margin-bottom:6px}
+.plan-details{color:rgba(255,255,255,.7);font-size:.9rem;margin-bottom:20px}
+
+/* QUICK ACTIONS */
+.action-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.action-btn{background:var(--bg2);border:1.5px solid var(--border);padding:20px;border-radius:16px;text-align:left;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:8px;text-decoration:none}
+.action-btn:hover{background:var(--white);border-color:var(--saffron);box-shadow:0 4px 12px rgba(249,115,22,.08);transform:translateY(-2px)}
+.action-icon{font-size:1.6rem}
+.action-text{font-weight:600;color:var(--navy);font-size:.95rem}
+.action-sub{font-size:.75rem;color:var(--text-soft)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:800px){ .grid-layout{grid-template-columns:1fr} .nav-center{display:none} }
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="dashboard.html" class="nav-brand">Knowledge <em>Nook</em></a>
+  <div class="nav-center">
+    <a href="dashboard.html" class="nav-link active">🏠 Dashboard</a>
+    <a href="membership.html" class="nav-link">💳 Membership</a>
+    <a href="attendance.html" class="nav-link">📅 Attendance</a>
+  </div>
+  <div class="nav-right">
+    <div class="user-pill">
+      <div class="user-avatar" id="navAvatar">U</div>
+      <span id="navUserName" style="font-size:.84rem;font-weight:600;">Student</span>
+    </div>
+    <button class="logout-btn" onclick="logout()">Log Out</button>
+  </div>
+</nav>
+
+<div class="container">
+  
+  <div class="page-header">
+    <h1 id="welcomeText">Welcome back, Student!</h1>
+    <p>Your portal to focused study and library management.</p>
+  </div>
+
+  <div class="grid-layout">
+    <div class="main-col">
+      
+      <div class="plan-hero">
+        <div class="status-badge">● ACTIVE MEMBERSHIP</div>
+        <div class="plan-name" id="dashPlanName">Standard Plan ⭐</div>
+        <div class="plan-details">Valid until: <strong>April 25, 2026</strong></div>
+        <a href="membership.html" style="color:var(--saffron); font-weight:700; text-decoration:none; font-size:0.9rem;">View Plan Details →</a>
+      </div>
+
+      <div class="card" id="verificationCard" style="margin-bottom: 24px; border-color: rgba(249,115,22,.4); background: linear-gradient(to right, var(--white), var(--saffron-light));">
+        <div class="card-title" style="color: var(--saffron);">⚠️ Account Verification</div>
+        
+        <div id="uploadFormArea">
+          <p style="font-size: 0.85rem; color: var(--text-mid); margin-bottom: 16px;">Please upload your Aadhaar Card or Student ID to verify your account.</p>
+          <input type="file" id="idUpload" accept="image/*,application/pdf" style="margin-bottom: 12px; font-size: 0.85rem; width: 100%;">
+          <button id="uploadBtn" class="logout-btn" style="background:var(--navy); color:#fff; border-color:var(--navy); width:100%;">Upload Document</button>
+        </div>
+        
+        <div id="uploadSuccessArea" style="display: none;">
+          <p style="color: var(--emerald); font-weight: 700; font-size: 0.9rem;">✅ Document Submitted!</p>
+          <p style="font-size: 0.8rem; color: var(--text-soft);">Your profile is pending verification by the librarian.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⚡ Quick Actions</div>
+        <div class="action-grid">
+          <a href="attendance.html" class="action-btn">
+            <span class="action-icon">📅</span>
+            <span class="action-text">My Attendance</span>
+            <span class="action-sub">Mark and track daily study logs</span>
+          </a>
+          <a href="membership.html" class="action-btn">
+            <span class="action-icon">💳</span>
+            <span class="action-text">Manage Plan</span>
+            <span class="action-sub">Renew or upgrade your seat</span>
+          </a>
+          <a href="notifications.html" class="action-btn">
+            <span class="action-icon">🔔</span>
+            <span class="action-text">Alerts & News</span>
+            <span class="action-sub">View recent library updates</span>
+          </a>
+          <button class="action-btn" onclick="alert('Locker management coming soon!')">
+            <span class="action-icon">🎧</span>
+            <span class="action-text">Locker Access</span>
+            <span class="action-sub">Secure your belongings</span>
+          </button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<script>
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyPbbY-KLAk0bdePtwIPCLIj6jMW9UzqQi-en_Y-ZcJrnoIyZ3jUh7OR4CAWb6YwN28/exec';
+
+window.onload = function() {
+    const userEmail = localStorage.getItem('kn_user_email');
+    
+    // If no email is found locally, they aren't logged in!
+    if (!userEmail) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    // Fetch REAL data from the Database
+    const formData = new FormData();
+    formData.append('action', 'get_dashboard_data');
+    formData.append('email', userEmail);
+
+    fetch(scriptURL, { method: 'POST', body: formData })
+      .then(res => res.json())
+      .then(data => {
+        if (data.result === 'success') {
+          const profile = data.profile;
+          
+          // Update local storage to keep it perfectly synced with DB
+          localStorage.setItem('kn_user_name', profile.name);
+          localStorage.setItem('kn_user_plan', profile.plan);
+          localStorage.setItem('kn_user_status', profile.status);
+
+          // Update UI with REAL data
+          document.getElementById('welcomeText').innerText = `Welcome back, ${profile.name.split(' ')[0]}!`;
+          document.getElementById('navUserName').innerText = profile.name.split(' ')[0];
+          document.getElementById('navAvatar').innerText = profile.name.charAt(0).toUpperCase();
+          
+          if (profile.plan) {
+            document.getElementById('dashPlanName').innerText = profile.plan.charAt(0).toUpperCase() + profile.plan.slice(1) + " Plan";
+          }
+
+          // Handle ID Verification UI based on real DB status
+          if (profile.status === 'Pending Verification' || profile.status === 'Verified') {
+            document.getElementById('uploadFormArea').style.display = 'none';
+            document.getElementById('uploadSuccessArea').style.display = 'block';
+            
+            if(profile.status === 'Verified') {
+                document.getElementById('uploadSuccessArea').innerHTML = '<p style="color: var(--emerald); font-weight: 700;">✅ Account Verified!</p>';
+            }
+          }
+        } else {
+          console.error("Database Error: ", data.message);
+        }
+      })
+      .catch(err => {
+        console.error("Network error fetching dashboard data.");
+      });
+  };
+
+  document.getElementById('uploadBtn').addEventListener('click', function() {
+    const fileInput = document.getElementById('idUpload');
+    const file = fileInput.files[0];
+    if (!file) { alert("Select a file first!"); return; }
+
+    const btn = this;
+    btn.textContent = "Uploading...";
+    btn.disabled = true;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const base64Data = e.target.result.split(',')[1]; 
+      const formData = new FormData();
+      formData.append('action', 'upload_id');
+      formData.append('email', localStorage.getItem('kn_user_email'));
+      formData.append('fileName', file.name);
+      formData.append('mimeType', file.type);
+      formData.append('fileBase64', base64Data);
+
+      fetch(scriptURL, { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(data => {
+          if (data.result === 'success') {
+            document.getElementById('uploadFormArea').style.display = 'none';
+            document.getElementById('uploadSuccessArea').style.display = 'block';
+            localStorage.setItem('kn_user_status', 'Pending Verification');
+          } else {
+            alert("Error: " + data.message);
+            btn.textContent = "Upload Document"; btn.disabled = false;
+          }
+        });
+    };
+    reader.readAsDataURL(file);
+  });
+
+  function logout() {
+    localStorage.clear();
+    window.location.href = 'login.html';
+  }
+</script>
+</body>
+</html>

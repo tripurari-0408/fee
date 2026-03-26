@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register — Knowledge Nook Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --saffron:#F97316;--saffron-light:#FEF3E7;--saffron-glow:rgba(249,115,22,.14);
+  --navy:#0F172A;--navy-mid:#1E3A5F;--navy-soft:#334155;
+  --emerald:#059669;--emerald-bg:rgba(5,150,105,.09);
+  --bg:#FDFCF8;--bg2:#F9F7F3;
+  --white:#FFFFFF;--border:#E8E3D9;--border-mid:#D4CEC3;
+  --text:#1A1309;--text-mid:#4A4036;--text-soft:#8A7D6E;
+  --radius:20px;--card-shadow:0 1px 3px rgba(0,0,0,.06),0 8px 32px rgba(0,0,0,.07);
+  --card-shadow-hover:0 4px 8px rgba(0,0,0,.06),0 20px 60px rgba(0,0,0,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;align-items:center;justify-content:center;overflow-x:hidden}
+
+/* BG PATTERN */
+body::before{content:'';position:fixed;inset:0;z-index:0;background-image:radial-gradient(circle at 18% 20%, rgba(249,115,22,.055) 0%, transparent 42%),radial-gradient(circle at 82% 78%, rgba(124,58,237,.05) 0%, transparent 40%),radial-gradient(circle at 50% 50%, rgba(217,119,6,.03) 0%, transparent 60%);pointer-events:none}
+
+.auth-wrap{position:relative;z-index:1;width:100%;max-width:480px;padding:40px 24px;animation:fadeUp .7s ease both}
+
+/* ── HEADER ── */
+.auth-header{text-align:center;margin-bottom:32px}
+.logo-badge{display:inline-flex;align-items:center;gap:8px;background:var(--saffron-light);border:1.5px solid rgba(249,115,22,.28);border-radius:50px;padding:6px 16px;font-size:.7rem;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--saffron);margin-bottom:16px;text-decoration:none;transition:all .3s}
+.logo-badge:hover{background:var(--saffron-glow)}
+h1{font-family:'Playfair Display',serif;font-size:2.2rem;font-weight:700;color:var(--navy);margin-bottom:8px}
+.subtitle{color:var(--text-soft);font-size:.95rem;line-height:1.5}
+
+/* ── AUTH CARD ── */
+.auth-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:40px 32px;box-shadow:var(--card-shadow);position:relative;overflow:hidden}
+.auth-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--saffron),#FBBF24)}
+
+/* ── GOOGLE BUTTON ── */
+.google-btn{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;background:var(--white);border:1.5px solid var(--border-mid);color:var(--navy);font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;padding:14px;border-radius:12px;cursor:pointer;transition:all .3s;box-shadow:0 2px 4px rgba(0,0,0,.02)}
+.google-btn:hover{background:var(--bg2);border-color:var(--text-soft);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.05)}
+.google-icon{width:22px;height:22px}
+
+/* ── DIVIDER ── */
+.divider{display:flex;align-items:center;text-align:center;margin:26px 0;color:var(--text-soft);font-size:.75rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.divider::before, .divider::after{content:'';flex:1;border-bottom:1.5px solid var(--border)}
+.divider span{padding:0 14px}
+
+/* ── FORM ── */
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:.82rem;font-weight:600;color:var(--navy-mid);margin-bottom:8px}
+.form-control{width:100%;background:var(--bg2);border:1.5px solid var(--border);border-radius:12px;padding:13px 16px;font-family:'DM Sans',sans-serif;font-size:.95rem;color:var(--navy);transition:all .3s;outline:none}
+.form-control::placeholder{color:var(--text-soft);opacity:.6}
+.form-control:focus{background:var(--white);border-color:var(--saffron);box-shadow:0 0 0 4px var(--saffron-glow)}
+
+/* ── SELECT PLAN ── */
+select.form-control{appearance:none;background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234A4036' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");background-repeat:no-repeat;background-position:right 16px center;background-size:16px}
+
+/* ── SUBMIT CTA ── */
+.submit-btn{display:block;width:100%;background:linear-gradient(135deg,#F97316,#EA580C);color:#fff;border:none;padding:15px;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.02em;cursor:pointer;transition:all .3s;box-shadow:0 6px 20px rgba(249,115,22,.3);margin-top:28px}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(249,115,22,.45)}
+
+/* ── FOOTER LINKS ── */
+.auth-footer{text-align:center;margin-top:24px;font-size:.85rem;color:var(--text-mid)}
+.auth-footer a{color:var(--saffron);font-weight:700;text-decoration:none;transition:color .2s}
+.auth-footer a:hover{color:#EA580C;text-decoration:underline}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:500px){
+  .auth-card{padding:32px 24px}
+}
+</style>
+</head>
+<body>
+
+<div class="auth-wrap">
+  
+  <div class="auth-header">
+    <a href="Index.html" class="logo-badge">← Back to Home</a>
+    <h1>Reserve Your Seat</h1>
+    <p class="subtitle">Join Knowledge Nook Library today.</p>
+  </div>
+
+  <div class="auth-card">
+    
+    <button class="google-btn" type="button" onclick="alert('Google Sign-In integration goes here!')">
+      <svg class="google-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+        <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+        <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.16 7.09-10.36 7.09-17.65z"/>
+        <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+        <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+      </svg>
+      Sign up with Google
+    </button>
+
+    <div class="divider"><span>Or register with email</span></div>
+
+    <form id="regForm" action="#" method="POST">
+      <div class="form-group">
+        <label for="fullName">Full Name</label>
+        <input type="text" id="fullName" class="form-control" placeholder="e.g. Rahul Kumar" required>
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" class="form-control" placeholder="your@email.com" required>
+      </div>
+
+      <div class="form-group">
+        <label for="phone">WhatsApp Number</label>
+        <input type="tel" id="phone" class="form-control" placeholder="+91 xxxxx xxxxx" required>
+      </div>
+
+      <div class="form-group">
+        <label for="plan">Select Plan</label>
+        <select id="plan" class="form-control" required>
+          <option value="" disabled selected>Choose a study plan...</option>
+          <option value="basic">Basic (6 Hrs Flexible)</option>
+          <option value="fundamental">Fundamental (12 PM - 6 PM)</option>
+          <option value="standard">Standard ⭐ (12 Hrs Flexible)</option>
+          <option value="professional">Professional 🎖 (Private Room)</option>
+        </select>
+      </div>
+
+      <button type="submit" class="submit-btn">Complete Registration</button>
+    </form>
+
+    <div class="auth-footer">
+      Already a member? <a href="login.html">Log in here</a>
+    </div>
+
+  </div>
+</div>
+<script>
+  // Paste your Google Apps Script Web App URL here:
+  const scriptURL = 'https://script.google.com/macros/s/AKfycbyPbbY-KLAk0bdePtwIPCLIj6jMW9UzqQi-en_Y-ZcJrnoIyZ3jUh7OR4CAWb6YwN28/exec';
+  
+  document.getElementById('regForm').addEventListener('submit', function(e) {
+    e.preventDefault(); 
+    
+    const name = document.getElementById('fullName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
+    const plan = document.getElementById('plan').value;
+
+    const phoneRegex = /^(?:\+91|91)?[6789]\d{9}$/;
+    
+    if (name.length < 3) { alert("Please enter your full name."); return; }
+    if (!phoneRegex.test(phone.replace(/\s+/g, ''))) { alert("Please enter a valid 10-digit Indian mobile number."); return; }
+    if (plan === "") { alert("Please select a study plan."); return; }
+
+    const btn = document.querySelector('.submit-btn');
+    const originalText = btn.textContent;
+    btn.textContent = "Saving your seat...";
+    btn.style.opacity = "0.7";
+    btn.disabled = true;
+
+    // Prepare data to send
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('email', email);
+    formData.append('phone', phone);
+    formData.append('plan', plan);
+
+    // Send data to Google Sheets
+    fetch(scriptURL, { method: 'POST', body: formData })
+      .then(response => {
+        alert("Registration successful! We will contact you shortly on WhatsApp.");
+        document.getElementById('regForm').reset(); // Clear the form
+        btn.textContent = originalText;
+        btn.style.opacity = "1";
+        btn.disabled = false;
+      })
+      .catch(error => {
+        console.error('Error!', error.message);
+        alert("Something went wrong. Please try again or contact us via WhatsApp.");
+        btn.textContent = originalText;
+        btn.style.opacity = "1";
+        btn.disabled = false;
+      });
+  });
+  google.accounts.id.initialize({
+      client_id: "873082059494-c2aehijj4ipm33h64uqrdp9ddsn8b15o.apps.googleusercontent.com", // <-- Right here!
+      callback: handleCredentialResponse
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notifications — Knowledge Nook Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --saffron:#F97316;--saffron-light:#FEF3E7;--saffron-glow:rgba(249,115,22,.13);
+  --navy:#0F172A;--navy-mid:#1E3A5F;
+  --emerald:#059669;--emerald-bg:rgba(5,150,105,.09);
+  --amber:#D97706;--red:#DC2626;--blue:#2563EB;
+  --bg:#FDFCF8;--bg2:#F9F7F3;
+  --white:#FFFFFF;--border:#E8E3D9;--border-mid:#D4CEC3;
+  --text:#1A1309;--text-mid:#4A4036;--text-soft:#8A7D6E;
+  --radius:18px;--shadow:0 1px 3px rgba(0,0,0,.05),0 8px 28px rgba(0,0,0,.07);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(circle at 10% 15%,rgba(249,115,22,.05),transparent 40%);pointer-events:none}
+
+.navbar{position:sticky;top:0;z-index:200;background:rgba(253,252,248,.92);backdrop-filter:blur(14px);border-bottom:1.5px solid var(--border);padding:0 28px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;height:64px}
+.nav-brand{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--navy);text-decoration:none}
+.nav-brand em{color:var(--saffron);font-style:normal}
+.nav-center{display:flex;align-items:center;gap:4px;justify-content:center}
+.nav-link{text-decoration:none;color:var(--text-soft);font-size:.84rem;font-weight:500;padding:7px 14px;border-radius:10px;transition:all .2s;white-space:nowrap}
+.nav-link:hover{background:var(--bg2);color:var(--navy)}
+.nav-link.active{background:var(--navy);color:#fff;font-weight:600}
+.nav-right{display:flex;align-items:center;gap:12px}
+.notif-btn{position:relative;text-decoration:none;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:var(--saffron-light);border:1.5px solid var(--saffron);color:var(--saffron);font-size:1.1rem;transition:all .2s}
+.notif-dot{position:absolute;top:-5px;right:-5px;background:#EF4444;color:#fff;font-size:.6rem;font-weight:800;min-width:18px;height:18px;border-radius:50px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--bg)}
+.notif-dot.hidden{display:none}
+.user-pill{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1.5px solid var(--border);border-radius:50px;padding:5px 14px 5px 5px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--saffron),#D97706);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0}
+.user-name{font-size:.84rem;font-weight:600;color:var(--navy)}
+.v-badge{width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:800;flex-shrink:0}
+.v-badge.blue{background:#2563EB;color:#fff}.v-badge.amber{background:#D97706;color:#fff}.v-badge.hidden{display:none!important}
+.logout-btn{border:1.5px solid var(--border);background:none;color:var(--text-soft);padding:7px 14px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.83rem;cursor:pointer;transition:all .2s}
+.logout-btn:hover{background:rgba(220,38,38,.07);border-color:var(--red);color:var(--red)}
+
+/* PAGE */
+.container{position:relative;z-index:1;max-width:760px;margin:0 auto;padding:36px 24px 100px;animation:fadeUp .6s ease both}
+
+.page-hd{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:28px}
+.page-hd h1{font-family:'Playfair Display',serif;font-size:2.1rem;color:var(--navy)}
+.mark-read-btn{background:var(--bg2);border:1.5px solid var(--border);color:var(--text-mid);padding:9px 18px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.84rem;cursor:pointer;transition:all .2s}
+.mark-read-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* FILTER TABS */
+.filter-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px;background:var(--bg2);border:1.5px solid var(--border);border-radius:14px;padding:6px}
+.ftab{border:none;background:none;color:var(--text-soft);font-family:'DM Sans',sans-serif;font-size:.83rem;font-weight:500;padding:8px 16px;border-radius:10px;cursor:pointer;transition:all .22s;white-space:nowrap}
+.ftab.active{background:var(--white);color:var(--navy);font-weight:700;box-shadow:var(--shadow)}
+.unread-count{display:inline-block;background:#EF4444;color:#fff;font-size:.62rem;font-weight:800;min-width:16px;height:16px;border-radius:50px;padding:0 4px;line-height:16px;margin-left:5px;vertical-align:middle;text-align:center}
+
+/* NOTIFICATION ITEMS */
+.notif-section{margin-bottom:10px}
+.section-date{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-soft);padding:0 0 8px;display:flex;align-items:center;gap:10px}
+.section-date::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.notif-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:10px;display:flex;align-items:flex-start;gap:14px;box-shadow:var(--shadow);transition:all .22s;cursor:pointer;position:relative}
+.notif-card:hover{border-color:var(--border-mid);box-shadow:0 4px 18px rgba(0,0,0,.09);transform:translateY(-1px)}
+.notif-card.unread{border-left:3px solid var(--saffron);background:linear-gradient(135deg,#FFFBF7,var(--white))}
+.notif-card.unread-blue{border-left:3px solid var(--blue)}
+.notif-card.unread-emerald{border-left:3px solid var(--emerald)}
+.notif-card.unread-red{border-left:3px solid var(--red)}
+
+.ni-icon-wrap{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.ni-icon-wrap.account{background:#FEF3E7}
+.ni-icon-wrap.library{background:#F0FDF4}
+.ni-icon-wrap.system{background:#EFF6FF}
+.ni-icon-wrap.alert{background:#FEF2F2}
+
+.ni-body{flex:1;min-width:0}
+.ni-body h3{font-size:.92rem;font-weight:700;color:var(--navy);margin-bottom:4px;line-height:1.3}
+.ni-body p{font-size:.83rem;color:var(--text-mid);line-height:1.5}
+.ni-meta{display:flex;align-items:center;gap:10px;margin-top:8px}
+.ni-time{font-size:.72rem;color:var(--text-soft)}
+.ni-type-badge{font-size:.65rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:20px}
+.ni-type-badge.account{background:#FEF3E7;color:var(--saffron)}
+.ni-type-badge.library{background:#F0FDF4;color:var(--emerald)}
+.ni-type-badge.system{background:#EFF6FF;color:var(--blue)}
+.ni-type-badge.alert{background:#FEF2F2;color:var(--red)}
+
+.unread-indicator{position:absolute;top:20px;right:18px;width:8px;height:8px;border-radius:50%;background:#EF4444}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:60px 20px;color:var(--text-soft)}
+.empty-state .es-icon{font-size:3rem;margin-bottom:14px}
+.empty-state h3{font-size:1.1rem;color:var(--navy);margin-bottom:8px}
+.empty-state p{font-size:.85rem;line-height:1.55}
+
+/* MOBILE NAV */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--white);border-top:1.5px solid var(--border);padding:8px 0 6px}
+.mobile-nav-inner{display:flex;justify-content:space-around}
+.mn-item{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:var(--text-soft);font-size:.68rem;font-weight:600;padding:4px 14px;border-radius:10px;transition:color .2s;position:relative}
+.mn-item.active{color:var(--saffron)}
+.mn-icon{font-size:1.25rem;line-height:1}
+.mn-notif-dot{position:absolute;top:0;right:8px;width:8px;height:8px;border-radius:50%;background:#EF4444;border:2px solid var(--white)}
+.mn-notif-dot.hidden{display:none}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:720px){.nav-center{display:none}.mobile-nav{display:block}.container{padding-bottom:90px}.logout-btn{display:none}.user-name{display:none}}
+@media(max-width:500px){.navbar{padding:0 16px}.page-hd{flex-direction:column;align-items:flex-start}}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="dashboard.html" class="nav-brand">Knowledge <em>Nook</em></a>
+  <div class="nav-center">
+    <a href="dashboard.html" class="nav-link">🏠 Dashboard</a>
+    <a href="membership.html" class="nav-link">💳 Membership</a>
+    <a href="attendance.html" class="nav-link">📅 Attendance</a>
+  </div>
+  <div class="nav-right">
+    <a href="notifications.html" class="notif-btn active" title="Notifications">
+      🔔
+      <span class="notif-dot hidden" id="navNotifCount">0</span>
+    </a>
+    <div class="user-pill">
+      <div class="user-avatar" id="navAvatar">U</div>
+      <span class="user-name" id="navUserName">Student</span>
+      <span class="v-badge blue hidden" id="vBadgeBlue">✓</span>
+      <span class="v-badge amber hidden" id="vBadgeAmber">⏳</span>
+    </div>
+    <button class="logout-btn" onclick="logout()">Log Out</button>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="page-hd">
+    <h1>🔔 Notifications</h1>
+    <button class="mark-read-btn" onclick="markAllRead()">✓ Mark All as Read</button>
+  </div>
+
+  <div class="filter-tabs">
+    <button class="ftab active" onclick="filterNotifs('all',this)">All <span class="unread-count" id="tabCountAll">0</span></button>
+    <button class="ftab" onclick="filterNotifs('unread',this)">Unread</button>
+    <button class="ftab" onclick="filterNotifs('account',this)">Account</button>
+    <button class="ftab" onclick="filterNotifs('library',this)">Library</button>
+    <button class="ftab" onclick="filterNotifs('system',this)">System</button>
+  </div>
+
+  <div id="notifContainer"></div>
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="dashboard.html" class="mn-item"><span class="mn-icon">🏠</span><span>Home</span></a>
+    <a href="membership.html" class="mn-item"><span class="mn-icon">💳</span><span>Plan</span></a>
+    <a href="attendance.html" class="mn-item"><span class="mn-icon">📅</span><span>Attendance</span></a>
+    <a href="notifications.html" class="mn-item active"><span class="mn-icon">🔔</span><span>Alerts</span></a>
+  </div>
+</div>
+
+<script>
+// 👇 PASTE YOUR GOOGLE SCRIPT WEB APP URL HERE
+const scriptURL = 'https://script.google.com/macros/s/AKfycbyPbbY-KLAk0bdePtwIPCLIj6jMW9UzqQi-en_Y-ZcJrnoIyZ3jUh7OR4CAWb6YwN28/exec';
+
+let currentFilter = 'all';
+let notifications = [];
+
+function getNotificationsFromDB() {
+  const userEmail = localStorage.getItem('kn_user_email');
+  const formData = new FormData();
+  formData.append('action', 'get_all_notifications');
+  formData.append('email', userEmail);
+
+  fetch(scriptURL, { method: 'POST', body: formData })
+    .then(res => res.json())
+    .then(data => {
+      if (data.result === 'success') {
+        const dbNotifs = data.notifications;
+        const localNotifs = JSON.parse(localStorage.getItem('kn_notifications') || '[]');
+        
+        // Merge: Keep the "read" status from local storage if the ID matches
+        notifications = dbNotifs.map(dn => {
+          const isRead = localNotifs.find(ln => ln.title === dn.title && ln.read);
+          return { ...dn, read: !!isRead };
+        });
+
+        saveNotifications(notifications);
+        updateBellBadge();
+        renderNotifications('all');
+      }
+    });
+}
+
+function saveNotifications(notifs){
+  localStorage.setItem('kn_notifications', JSON.stringify(notifs));
+}
+
+const TYPE_COLORS = { account:'unread', library:'unread-emerald', system:'unread-blue', alert:'unread-red' };
+
+function renderNotifications(filter){
+  currentFilter = filter;
+  const container = document.getElementById('notifContainer');
+  let filtered = notifications.filter(n=>{
+    if(filter === 'all') return true;
+    if(filter === 'unread') return !n.read;
+    return n.type === filter;
+  });
+
+  if(filtered.length === 0){
+    container.innerHTML = `<div class="empty-state"><div class="es-icon">🔕</div><h3>No notifications</h3><p>Everything is up to date.</p></div>`;
+    return;
+  }
+
+  let html = '';
+  filtered.forEach(n=>{
+    const unreadClass = !n.read ? TYPE_COLORS[n.type] || 'unread' : '';
+    html += `
+    <div class="notif-card ${unreadClass}" onclick="markRead(${n.id})">
+      <div class="ni-icon-wrap ${n.type}">${n.icon}</div>
+      <div class="ni-body">
+        <h3>${n.title}</h3>
+        <p>${n.body}</p>
+        <div class="ni-meta"><span class="ni-time">🕐 ${n.time}</span></div>
+      </div>
+      ${!n.read ? '<span class="unread-indicator"></span>' : ''}
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function markRead(id){
+  notifications = notifications.map(n=> n.id===id ? {...n, read:true} : n);
+  saveNotifications(notifications);
+  updateBellBadge();
+  renderNotifications(currentFilter);
+}
+
+function markAllRead(){
+  notifications = notifications.map(n=>({...n,read:true}));
+  saveNotifications(notifications);
+  updateBellBadge();
+  renderNotifications(currentFilter);
+}
+
+function filterNotifs(filter, btn){
+  document.querySelectorAll('.ftab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderNotifications(filter);
+}
+
+function updateBellBadge(){
+  const unread = notifications.filter(n=>!n.read).length;
+  const dot = document.getElementById('navNotifCount');
+  if (dot) {
+    if(unread > 0){ dot.textContent = unread; dot.classList.remove('hidden'); }
+    else { dot.classList.add('hidden'); }
+  }
+}
+
+function updateBadges(){
+  const status = localStorage.getItem('kn_user_status') || 'new';
+  document.getElementById('vBadgeBlue').classList.toggle('hidden', status !== 'Verified');
+  document.getElementById('vBadgeAmber').classList.toggle('hidden', status !== 'Pending Verification');
+}
+
+window.onload = function(){
+  const userName = localStorage.getItem('kn_user_name');
+  if(!userName){ window.location.href='login.html'; return; }
+  document.getElementById('navAvatar').textContent = userName.charAt(0).toUpperCase();
+  document.getElementById('navUserName').textContent = userName.split(' ')[0];
+  updateBadges();
+  getNotificationsFromDB();
+};
+
+function logout(){
+  localStorage.clear();
+  window.location.href='login.html';
+}
+</script>
+</body>
+</html>

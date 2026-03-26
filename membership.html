@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Membership — Knowledge Nook Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --saffron:#F97316;--saffron-light:#FEF3E7;--saffron-glow:rgba(249,115,22,.13);
+  --navy:#0F172A;--navy-mid:#1E3A5F;
+  --emerald:#059669;--emerald-bg:rgba(5,150,105,.09);
+  --amber:#D97706;--red:#DC2626;--blue:#2563EB;--purple:#7C3AED;
+  --bg:#FDFCF8;--bg2:#F9F7F3;
+  --white:#FFFFFF;--border:#E8E3D9;--border-mid:#D4CEC3;
+  --text:#1A1309;--text-mid:#4A4036;--text-soft:#8A7D6E;
+  --radius:18px;--shadow:0 1px 3px rgba(0,0,0,.05),0 8px 28px rgba(0,0,0,.07);
+  --shadow-hover:0 4px 8px rgba(0,0,0,.06),0 20px 56px rgba(0,0,0,.11);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(circle at 10% 15%,rgba(249,115,22,.05),transparent 40%),radial-gradient(circle at 90% 85%,rgba(124,58,237,.04),transparent 40%);pointer-events:none}
+
+.navbar{position:sticky;top:0;z-index:200;background:rgba(253,252,248,.92);backdrop-filter:blur(14px);border-bottom:1.5px solid var(--border);padding:0 28px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;height:64px}
+.nav-brand{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--navy);text-decoration:none}
+.nav-brand em{color:var(--saffron);font-style:normal}
+.nav-center{display:flex;align-items:center;gap:4px;justify-content:center}
+.nav-link{text-decoration:none;color:var(--text-soft);font-size:.84rem;font-weight:500;padding:7px 14px;border-radius:10px;transition:all .2s;white-space:nowrap}
+.nav-link:hover{background:var(--bg2);color:var(--navy)}
+.nav-link.active{background:var(--navy);color:#fff;font-weight:600}
+.nav-right{display:flex;align-items:center;gap:12px}
+.notif-btn{position:relative;text-decoration:none;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:var(--bg2);border:1.5px solid var(--border);color:var(--text-mid);font-size:1.1rem;transition:all .2s}
+.notif-btn:hover{background:var(--white);border-color:var(--saffron);color:var(--saffron)}
+.notif-dot{position:absolute;top:-5px;right:-5px;background:#EF4444;color:#fff;font-size:.6rem;font-weight:800;min-width:18px;height:18px;border-radius:50px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--bg)}
+.notif-dot.hidden{display:none}
+.user-pill{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1.5px solid var(--border);border-radius:50px;padding:5px 14px 5px 5px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--saffron),#D97706);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0}
+.user-name{font-size:.84rem;font-weight:600;color:var(--navy)}
+.v-badge{width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:800;flex-shrink:0}
+.v-badge.blue{background:#2563EB;color:#fff}.v-badge.amber{background:#D97706;color:#fff}.v-badge.hidden{display:none!important}
+.logout-btn{border:1.5px solid var(--border);background:none;color:var(--text-soft);padding:7px 14px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.83rem;cursor:pointer;transition:all .2s}
+.logout-btn:hover{background:rgba(220,38,38,.07);border-color:var(--red);color:var(--red)}
+
+/* PAGE */
+.container{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:36px 24px 100px;animation:fadeUp .6s ease both}
+.page-hd{margin-bottom:28px}
+.page-hd h1{font-family:'Playfair Display',serif;font-size:2.2rem;color:var(--navy);margin-bottom:6px}
+.page-hd p{color:var(--text-soft);font-size:.94rem}
+
+/* PLAN STATUS HERO */
+.plan-hero{background:linear-gradient(135deg,var(--navy),var(--navy-mid));border-radius:20px;padding:32px;color:#fff;position:relative;overflow:hidden;margin-bottom:22px}
+.plan-hero::before{content:'';position:absolute;top:-50px;right:-50px;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(249,115,22,.25),transparent 70%);pointer-events:none}
+.plan-hero::after{content:'';position:absolute;bottom:-50px;left:30%;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(124,58,237,.18),transparent 70%);pointer-events:none}
+.hero-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:22px;position:relative;z-index:1}
+.status-chip{display:inline-flex;align-items:center;gap:6px;background:rgba(52,211,153,.2);color:#34D399;font-size:.72rem;font-weight:700;padding:5px 14px;border-radius:20px;letter-spacing:.06em;border:1px solid rgba(52,211,153,.3)}
+.pulsedot{width:6px;height:6px;border-radius:50%;background:#34D399;animation:blink 1.5s ease infinite;flex-shrink:0}
+.plan-big-name{font-family:'Playfair Display',serif;font-size:2.1rem;margin-bottom:4px}
+.plan-tagline{color:rgba(255,255,255,.6);font-size:.88rem}
+.renew-btn{background:var(--saffron);color:#fff;border:none;padding:11px 24px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.9rem;cursor:pointer;transition:all .25s;box-shadow:0 4px 14px rgba(249,115,22,.35)}
+.renew-btn:hover{background:#EA580C;transform:translateY(-2px)}
+.hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;position:relative;z-index:1}
+.h-stat{background:rgba(255,255,255,.08);border-radius:14px;padding:16px 18px;border:1px solid rgba(255,255,255,.1)}
+.h-stat-val{font-family:'Playfair Display',serif;font-size:1.7rem;font-weight:700;line-height:1;margin-bottom:4px}
+.h-stat-label{font-size:.75rem;color:rgba(255,255,255,.55)}
+.expiry-bar{background:rgba(255,255,255,.12);border-radius:30px;height:5px;margin-top:8px;overflow:hidden}
+.expiry-fill{height:100%;border-radius:30px;background:linear-gradient(90deg,#34D399,#10B981);transition:width 1s ease}
+
+/* PLAN FEATURES */
+.plan-features-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:26px;margin-bottom:22px;box-shadow:var(--shadow)}
+.card-title{font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-soft);margin-bottom:20px;display:flex;align-items:center;gap:8px}
+.features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.feat-item{display:flex;align-items:flex-start;gap:11px;padding:14px;background:var(--bg2);border-radius:12px;border:1.5px solid var(--border)}
+.feat-icon{font-size:1.25rem;flex-shrink:0;margin-top:1px}
+.feat-text strong{font-size:.88rem;color:var(--navy);display:block;margin-bottom:2px}
+.feat-text span{font-size:.78rem;color:var(--text-soft)}
+
+/* UPGRADE BANNER */
+.upgrade-banner{background:linear-gradient(135deg,#7C3AED,#5B21B6);border-radius:16px;padding:24px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.upgrade-text h3{font-family:'Playfair Display',serif;font-size:1.3rem;color:#fff;margin-bottom:4px}
+.upgrade-text p{font-size:.84rem;color:rgba(255,255,255,.7)}
+.upgrade-cta{background:#fff;color:#7C3AED;border:none;padding:10px 22px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;white-space:nowrap;transition:all .2s}
+.upgrade-cta:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(0,0,0,.2)}
+
+/* TRANSACTIONS */
+.txn-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow)}
+.txn-header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+.txn-total{background:var(--bg2);border:1.5px solid var(--border);border-radius:10px;padding:10px 18px;text-align:center}
+.txn-total-val{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--navy)}
+.txn-total-label{font-size:.72rem;color:var(--text-soft)}
+.table-wrap{overflow-x:auto;border-radius:12px;border:1.5px solid var(--border)}
+.txn-table{width:100%;border-collapse:collapse;min-width:520px}
+.txn-table thead tr{background:var(--bg2)}
+.txn-table thead th{padding:12px 16px;font-size:.72rem;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--text-soft);text-align:left;white-space:nowrap;border-bottom:1.5px solid var(--border)}
+.txn-table tbody td{padding:14px 16px;border-top:1px solid var(--border);font-size:.86rem;color:var(--text-mid);vertical-align:middle}
+.txn-table tbody tr:hover td{background:var(--bg2)}
+.txn-id{font-family:monospace;font-size:.78rem;color:var(--text-soft);background:var(--bg2);padding:3px 8px;border-radius:6px;white-space:nowrap}
+.txn-plan{font-weight:600;color:var(--navy)}
+.amount-cell{font-family:'Playfair Display',serif;font-size:1rem;font-weight:700;color:var(--navy);white-space:nowrap}
+.status-paid{display:inline-flex;align-items:center;gap:5px;background:#F0FDF4;color:var(--emerald);font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:20px;border:1px solid rgba(5,150,105,.2)}
+.status-pending{display:inline-flex;align-items:center;gap:5px;background:#FFFBEB;color:var(--amber);font-size:.72rem;font-weight:700;padding:4px 10px;border-radius:20px;border:1px solid rgba(217,119,6,.2)}
+.receipt-btn{background:none;border:1.5px solid var(--border);color:var(--text-mid);padding:5px 12px;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.75rem;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.receipt-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+.txn-badge{font-size:.72rem;font-weight:600;padding:3px 9px;border-radius:20px}
+.badge-reg{background:#EFF6FF;color:var(--blue)}
+.badge-monthly{background:var(--saffron-light);color:var(--saffron)}
+.badge-quarterly{background:#F0FDF4;color:var(--emerald)}
+
+/* MOBILE NAV */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--white);border-top:1.5px solid var(--border);padding:8px 0 6px}
+.mobile-nav-inner{display:flex;justify-content:space-around}
+.mn-item{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:var(--text-soft);font-size:.68rem;font-weight:600;padding:4px 14px;border-radius:10px;transition:color .2s;position:relative}
+.mn-item.active{color:var(--saffron)}
+.mn-icon{font-size:1.25rem;line-height:1}
+.mn-notif-dot{position:absolute;top:0;right:8px;width:8px;height:8px;border-radius:50%;background:#EF4444;border:2px solid var(--white)}
+.mn-notif-dot.hidden{display:none}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:720px){.nav-center{display:none}.mobile-nav{display:block}.container{padding-bottom:90px}.logout-btn{display:none}.user-name{display:none}.hero-stats{grid-template-columns:1fr 1fr}.features-grid{grid-template-columns:1fr}}
+@media(max-width:500px){.navbar{padding:0 16px}.hero-stats{grid-template-columns:1fr}.plan-hero{padding:22px 20px}}
+</style>
+</head>
+<body>
+
+<nav class="navbar">
+  <a href="dashboard.html" class="nav-brand">Knowledge <em>Nook</em></a>
+  <div class="nav-center">
+    <a href="dashboard.html" class="nav-link">🏠 Dashboard</a>
+    <a href="membership.html" class="nav-link active">💳 Membership</a>
+    <a href="attendance.html" class="nav-link">📅 Attendance</a>
+  </div>
+  <div class="nav-right">
+    <a href="notifications.html" class="notif-btn" title="Notifications">
+      🔔<span class="notif-dot hidden" id="navNotifCount">0</span>
+    </a>
+    <div class="user-pill">
+      <div class="user-avatar" id="navAvatar">U</div>
+      <span class="user-name" id="navUserName">Student</span>
+      <span class="v-badge blue hidden" id="vBadgeBlue">✓</span>
+      <span class="v-badge amber hidden" id="vBadgeAmber">⏳</span>
+    </div>
+    <button class="logout-btn" onclick="logout()">Log Out</button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div class="page-hd">
+    <h1>💳 Membership</h1>
+    <p>Your current plan details, features, and complete payment history.</p>
+  </div>
+
+  <!-- PLAN HERO -->
+  <div class="plan-hero">
+    <div class="hero-top">
+      <div>
+        <div class="status-chip"><span class="pulsedot"></span> ACTIVE MEMBERSHIP</div>
+        <div class="plan-big-name" id="heroPlanName">Standard Plan ⭐</div>
+        <div class="plan-tagline">12 Hours Daily Flexible Access · Hall 01 & Hall 02</div>
+      </div>
+      <button class="renew-btn" onclick="alert('Redirecting to payment gateway...')">🔄 Renew Plan</button>
+    </div>
+    <div class="hero-stats">
+      <div class="h-stat">
+        <div class="h-stat-val" id="heroDaysLeft">—</div>
+        <div class="h-stat-label">Days Remaining</div>
+        <div class="expiry-bar"><div class="expiry-fill" id="heroExpiryFill" style="width:60%"></div></div>
+      </div>
+      <div class="h-stat">
+        <div class="h-stat-val" id="heroExpiry">—</div>
+        <div class="h-stat-label">Expiry Date</div>
+      </div>
+      <div class="h-stat">
+        <div class="h-stat-val" id="heroMonthlyRate">₹1,000</div>
+        <div class="h-stat-label">Monthly Rate</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PLAN FEATURES -->
+  <div class="plan-features-card">
+    <div class="card-title">🎁 What's Included in Your Plan</div>
+    <div class="features-grid" id="featuresGrid">
+      <!-- populated by JS -->
+    </div>
+  </div>
+
+  <!-- UPGRADE BANNER (only for basic/fundamental) -->
+  <div class="upgrade-banner" id="upgradeBanner" style="display:none">
+    <div class="upgrade-text">
+      <h3>Upgrade for more study time</h3>
+      <p>Switch to Standard or Professional for 12 hours or unlimited access every day.</p>
+    </div>
+    <button class="upgrade-cta" onclick="window.location.href='../KnowledgeNookLibrary_FeeStructure.html'">See All Plans →</button>
+  </div>
+
+  <!-- TRANSACTION HISTORY -->
+  <div class="txn-card">
+    <div class="txn-header">
+      <div class="card-title" style="margin-bottom:0">📋 Transaction History</div>
+      <div class="txn-total">
+        <div class="txn-total-val" id="totalSpent">—</div>
+        <div class="txn-total-label">Total Paid (All Time)</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table class="txn-table">
+        <thead>
+          <tr>
+            <th>Receipt ID</th>
+            <th>Date</th>
+            <th>Plan</th>
+            <th>Duration</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Receipt</th>
+          </tr>
+        </thead>
+        <tbody id="txnTableBody">
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="dashboard.html" class="mn-item"><span class="mn-icon">🏠</span><span>Home</span></a>
+    <a href="membership.html" class="mn-item active"><span class="mn-icon">💳</span><span>Plan</span></a>
+    <a href="attendance.html" class="mn-item"><span class="mn-icon">📅</span><span>Attendance</span></a>
+    <a href="notifications.html" class="mn-item"><span class="mn-icon">🔔</span><span>Alerts</span><span class="mn-notif-dot hidden" id="mnDot"></span></a>
+  </div>
+</div>
+
+<script>
+// 👇 PASTE YOUR GOOGLE SCRIPT WEB APP URL HERE
+const scriptURL = 'https://script.google.com/macros/s/AKfycbyPbbY-KLAk0bdePtwIPCLIj6jMW9UzqQi-en_Y-ZcJrnoIyZ3jUh7OR4CAWb6YwN28/exec';
+
+let TRANSACTIONS = [];
+
+const PLAN_FEATURES = {
+  basic: [{icon:'⏱️',label:'6 Hours Access',detail:'Morning or Evening slot'},{icon:'🪑',label:'Normal Seat',detail:'Hall 01'},{icon:'🖨️',label:'10 Free Printouts',detail:'Per month'},{icon:'📶',label:'High-Speed Wi-Fi',detail:'Included'},{icon:'❄️',label:'AC Environment',detail:'Fully air-conditioned'},{icon:'💧',label:'RO Water',detail:'Chilled, hot & normal'}],
+  fundamental: [{icon:'⏱️',label:'6 Hours Access',detail:'Fixed 12 PM – 6 PM slot'},{icon:'🪑',label:'Normal Seat',detail:'Hall 01'},{icon:'🖨️',label:'10 Free Printouts',detail:'Per month'},{icon:'📶',label:'High-Speed Wi-Fi',detail:'Included'},{icon:'❄️',label:'AC Environment',detail:'Fully air-conditioned'},{icon:'💧',label:'RO Water',detail:'Chilled, hot & normal'}],
+  standard: [{icon:'⏱️',label:'12 Hours Access',detail:'Come any time you want'},{icon:'🪑',label:'Larger Seat',detail:'Hall 01 or Hall 02'},{icon:'🖨️',label:'25 Free Printouts',detail:'Per month'},{icon:'📶',label:'High-Speed Wi-Fi',detail:'Included'},{icon:'❄️',label:'AC Environment',detail:'Fully air-conditioned'},{icon:'💧',label:'RO Water',detail:'Chilled, hot & normal'}],
+  professional: [{icon:'⏱️',label:'Unlimited Hours',detail:'No daily time cap, ever'},{icon:'🚪',label:'Private Room',detail:'Maximum focus, zero noise'},{icon:'🖨️',label:'25 Free Printouts',detail:'Per month'},{icon:'📶',label:'High-Speed Wi-Fi',detail:'Included'},{icon:'❄️',label:'AC Environment',detail:'Fully air-conditioned'},{icon:'💧',label:'RO Water',detail:'Chilled, hot & normal'}],
+};
+
+const PLAN_RATES = { basic:500, fundamental:600, standard:1000, professional:1400 };
+
+function renderTransactions(){
+  const tbody = document.getElementById('txnTableBody');
+  
+  if (TRANSACTIONS.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:30px;">No transactions found. Make a payment to see your history here!</td></tr>`;
+    document.getElementById('totalSpent').textContent = '₹0';
+    return;
+  }
+
+  // Calculate real total spent
+  const total = TRANSACTIONS.filter(t=>t.status==='paid').reduce((s,t)=>s+(Number(t.amount)||0),0);
+  document.getElementById('totalSpent').textContent = '₹' + total.toLocaleString('en-IN');
+
+  tbody.innerHTML = TRANSACTIONS.map(t=>`
+    <tr>
+      <td><span class="txn-id">${t.id}</span></td>
+      <td>${t.date}</td>
+      <td><span class="txn-plan">${t.plan}</span></td>
+      <td><span class="txn-badge ${t.type==='reg'?'badge-reg':t.type==='monthly'?'badge-monthly':'badge-quarterly'}">${t.type.toUpperCase()}</span></td>
+      <td><span class="amount-cell">₹${Number(t.amount).toLocaleString('en-IN')}</span></td>
+      <td>${t.status==='paid'?'<span class="status-paid">✓ Paid</span>':'<span class="status-pending">⏳ Pending</span>'}</td>
+      <td><button class="receipt-btn" onclick="downloadReceipt('${t.id}','${t.date}',${t.amount})">🧾 Receipt</button></td>
+    </tr>`).join('');
+}
+
+function downloadReceipt(id, date, amount){
+  const userName = localStorage.getItem('kn_user_name') || 'Student';
+  const content = `KNOWLEDGE NOOK LIBRARY\nBMP 16, Prakash Colony, Maulana Azad Nagar, Patna - 801105\n\n===== PAYMENT RECEIPT =====\nReceipt ID : ${id}\nDate       : ${date}\nMember     : ${userName}\nAmount Paid: ₹${Number(amount).toLocaleString('en-IN')}\nStatus     : PAID\n===========================\nThank you for your membership!\nFor queries: +91 79035 47986`;
+  const blob = new Blob([content],{type:'text/plain'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `Receipt-${id}.txt`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+function renderFeatures(plan){
+  const feats = PLAN_FEATURES[plan.toLowerCase()] || PLAN_FEATURES.standard;
+  document.getElementById('featuresGrid').innerHTML = feats.map(f=>`
+    <div class="feat-item">
+      <div class="feat-icon">${f.icon}</div>
+      <div class="feat-text"><strong>${f.label}</strong><span>${f.detail}</span></div>
+    </div>`).join('');
+}
+
+function updateBadges(){
+  const status = localStorage.getItem('kn_user_status') || 'new';
+  document.getElementById('vBadgeBlue').classList.toggle('hidden', status !== 'Verified');
+  document.getElementById('vBadgeAmber').classList.toggle('hidden', status !== 'Pending Verification');
+}
+
+function calculateExpiryUI(expiryStr, plan) {
+  // If no date is set in DB, give a default 30 days from now for UI purposes
+  let expiryDate = expiryStr ? new Date(expiryStr) : new Date(new Date().setDate(new Date().getDate() + 30));
+  const now = new Date();
+  
+  const daysLeft = Math.max(0, Math.ceil((expiryDate - now)/(1000*60*60*24)));
+  document.getElementById('heroDaysLeft').textContent = daysLeft;
+  
+  // Format to nice date string
+  document.getElementById('heroExpiry').textContent = expiryDate.toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+  
+  // Progress bar logic (assuming a 30 day cycle)
+  document.getElementById('heroExpiryFill').style.width = Math.min(100, Math.round((daysLeft/30)*100)) + '%';
+  
+  // Color the bar red if less than 5 days
+  if(daysLeft <= 5) {
+      document.getElementById('heroExpiryFill').style.background = "linear-gradient(90deg, #DC2626, #EF4444)";
+  }
+}
+
+// --- FETCH FROM DATABASE ---
+function fetchMembershipData(email, plan) {
+  const formData = new FormData();
+  formData.append('action', 'get_membership_data');
+  formData.append('email', email);
+
+  fetch(scriptURL, { method: 'POST', body: formData })
+    .then(res => res.json())
+    .then(data => {
+      if (data.result === 'success') {
+        TRANSACTIONS = data.transactions;
+        renderTransactions();
+        calculateExpiryUI(data.expiry, plan);
+      }
+    })
+    .catch(err => console.error("Database connection failed for membership."));
+}
+
+window.onload = function(){
+  const userName = localStorage.getItem('kn_user_name');
+  const userEmail = localStorage.getItem('kn_user_email');
+  
+  if(!userName || !userEmail){ window.location.href='login.html'; return; }
+  
+  document.getElementById('navAvatar').textContent = userName.charAt(0).toUpperCase();
+  document.getElementById('navUserName').textContent = userName.split(' ')[0];
+  updateBadges();
+
+  const plan = localStorage.getItem('kn_user_plan') || 'standard';
+  const planMap = {basic:'Basic Plan',fundamental:'Fundamental Plan',standard:'Standard Plan ⭐',professional:'Professional Plan 🎖'};
+  document.getElementById('heroPlanName').textContent = planMap[plan.toLowerCase()] || 'Standard Plan ⭐';
+  document.getElementById('heroMonthlyRate').textContent = '₹' + (PLAN_RATES[plan.toLowerCase()] || 1000).toLocaleString('en-IN');
+
+  renderFeatures(plan);
+  
+  // Show upgrade banner only for basic/fundamental
+  if(plan === 'basic' || plan === 'fundamental'){
+    document.getElementById('upgradeBanner').style.display = 'flex';
+  }
+
+  // Fetch real data!
+  fetchMembershipData(userEmail, plan);
+
+  // Notification badge
+  const notifs = JSON.parse(localStorage.getItem('kn_notifications')||'[]');
+  const unread = notifs.filter(n=>!n.read).length;
+  const dot = document.getElementById('navNotifCount');
+  if(unread > 0){ dot.textContent = unread; dot.classList.remove('hidden'); }
+  const mnDot = document.getElementById('mnDot');
+  if(unread > 0) mnDot.classList.remove('hidden');
+};
+
+function logout(){
+  localStorage.clear();
+  window.location.href='login.html';
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance — Knowledge Nook Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --saffron:#F97316;--saffron-light:#FEF3E7;--saffron-glow:rgba(249,115,22,.14);
+  --navy:#0F172A;--navy-mid:#1E3A5F;--navy-soft:#334155;
+  --emerald:#059669;--emerald-bg:rgba(5,150,105,.09);
+  --amber:#D97706;--amber-bg:rgba(217,119,6,.09);
+  --red:#DC2626;--red-bg:rgba(220,38,38,.07);
+  --blue:#2563EB;--purple:#7C3AED;
+  --bg:#FDFCF8;--bg2:#F9F7F3;--bg3:#F0EDE5;
+  --white:#FFFFFF;--border:#E8E3D9;--border-mid:#D4CEC3;
+  --text:#1A1309;--text-mid:#4A4036;--text-soft:#8A7D6E;
+  --radius:18px;
+  --shadow:0 1px 3px rgba(0,0,0,.05),0 8px 28px rgba(0,0,0,.07);
+  --shadow-up:0 4px 8px rgba(0,0,0,.06),0 20px 56px rgba(0,0,0,.11);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;background:radial-gradient(circle at 8% 12%,rgba(249,115,22,.06),transparent 40%),radial-gradient(circle at 88% 82%,rgba(5,150,105,.05),transparent 40%);pointer-events:none}
+
+/* ── NAVBAR ── */
+.navbar{position:sticky;top:0;z-index:200;background:rgba(253,252,248,.93);backdrop-filter:blur(16px);border-bottom:1.5px solid var(--border);padding:0 28px;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;height:64px}
+.nav-brand{font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--navy);text-decoration:none;white-space:nowrap}
+.nav-brand em{color:var(--saffron);font-style:normal}
+.nav-center{display:flex;align-items:center;gap:4px;justify-content:center}
+.nav-link{text-decoration:none;color:var(--text-soft);font-size:.84rem;font-weight:500;padding:7px 14px;border-radius:10px;transition:all .2s;white-space:nowrap}
+.nav-link:hover{background:var(--bg2);color:var(--navy)}
+.nav-link.active{background:var(--navy);color:#fff;font-weight:600}
+.nav-right{display:flex;align-items:center;gap:12px}
+.notif-btn{position:relative;text-decoration:none;width:40px;height:40px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:var(--bg2);border:1.5px solid var(--border);color:var(--text-mid);font-size:1.1rem;transition:all .2s}
+.notif-btn:hover{background:var(--white);border-color:var(--saffron);color:var(--saffron)}
+.notif-dot{position:absolute;top:-5px;right:-5px;background:#EF4444;color:#fff;font-size:.6rem;font-weight:800;min-width:18px;height:18px;border-radius:50px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--bg)}
+.notif-dot.hidden{display:none}
+.user-pill{display:flex;align-items:center;gap:8px;background:var(--bg2);border:1.5px solid var(--border);border-radius:50px;padding:5px 14px 5px 5px}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--saffron),#D97706);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.9rem;flex-shrink:0}
+.user-name{font-size:.84rem;font-weight:600;color:var(--navy)}
+.v-badge{width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:800;flex-shrink:0}
+.v-badge.blue{background:#2563EB;color:#fff}.v-badge.amber{background:#D97706;color:#fff}.v-badge.hidden{display:none!important}
+.logout-btn{border:1.5px solid var(--border);background:none;color:var(--text-soft);padding:7px 14px;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:600;font-size:.83rem;cursor:pointer;transition:all .2s}
+.logout-btn:hover{background:var(--red-bg);border-color:var(--red);color:var(--red)}
+
+/* ── LAYOUT ── */
+.container{position:relative;z-index:1;max-width:1060px;margin:0 auto;padding:34px 24px 100px}
+
+.page-hd{margin-bottom:26px;animation:fadeDown .6s ease both}
+.page-hd h1{font-family:'Playfair Display',serif;font-size:2.1rem;color:var(--navy);margin-bottom:5px}
+.page-hd p{color:var(--text-soft);font-size:.93rem}
+
+/* ── HOURS STATS ROW ── */
+.hours-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:13px;margin-bottom:22px;animation:fadeUp .55s .04s ease both}
+.h-stat{background:var(--white);border:1.5px solid var(--border);border-radius:16px;padding:18px 18px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:transform .22s,box-shadow .22s}
+.h-stat:hover{transform:translateY(-3px);box-shadow:var(--shadow-up)}
+.h-stat::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:16px 16px 0 0}
+.h-stat.hs-total::before{background:linear-gradient(90deg,#7C3AED,#A78BFA)}
+.h-stat.hs-month::before{background:linear-gradient(90deg,#2563EB,#60A5FA)}
+.h-stat.hs-week::before{background:linear-gradient(90deg,#059669,#34D399)}
+.h-stat.hs-pct::before{background:linear-gradient(90deg,#F97316,#FBBF24)}
+.h-stat.hs-streak::before{background:linear-gradient(90deg,#DC2626,#FB7185)}
+.h-icon{font-size:1.3rem;margin-bottom:8px}
+.h-val{font-family:'Playfair Display',serif;font-size:1.9rem;font-weight:700;color:var(--navy);line-height:1;margin-bottom:3px}
+.h-label{font-size:.72rem;color:var(--text-soft);font-weight:500;line-height:1.3}
+.h-sub{font-size:.68rem;color:var(--text-soft);margin-top:3px}
+.h-bar{background:var(--bg3);border-radius:30px;height:4px;margin-top:8px;overflow:hidden}
+.h-bar-fill{height:100%;border-radius:30px;background:linear-gradient(90deg,#F97316,#FBBF24);transition:width 1s ease}
+
+/* ── TODAY CHECK-IN/OUT PANEL ── */
+.checkin-panel{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:24px 26px;box-shadow:var(--shadow);margin-bottom:20px;animation:fadeUp .55s .08s ease both}
+.checkin-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:18px}
+.today-label-sm{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-soft);margin-bottom:4px}
+.today-date-big{font-size:1.05rem;font-weight:700;color:var(--navy)}
+.today-status-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 15px;border-radius:20px;font-size:.83rem;font-weight:700}
+.tsc-none{background:var(--bg2);color:var(--text-soft);border:1.5px solid var(--border)}
+.tsc-in{background:rgba(5,150,105,.12);color:var(--emerald);border:1.5px solid rgba(5,150,105,.28)}
+.tsc-done{background:rgba(37,99,235,.1);color:var(--blue);border:1.5px solid rgba(37,99,235,.22)}
+.tsc-absent{background:var(--red-bg);color:var(--red);border:1.5px solid rgba(220,38,38,.22)}
+.pulsedot{width:7px;height:7px;border-radius:50%;background:currentColor;animation:blink 1.4s ease infinite;flex-shrink:0}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+.checkin-times{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.time-box{flex:1;min-width:140px;background:var(--bg2);border:1.5px solid var(--border);border-radius:13px;padding:14px 16px;transition:all .3s}
+.time-box.active{border-color:rgba(5,150,105,.4);background:rgba(5,150,105,.05)}
+.time-box.done{border-color:rgba(37,99,235,.3);background:rgba(37,99,235,.05)}
+.tb-label{font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-soft);margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.tb-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.tb-dot.green{background:var(--emerald)}
+.tb-dot.blue{background:var(--blue)}
+.tb-time{font-family:'Playfair Display',serif;font-size:1.55rem;font-weight:700;color:var(--navy);line-height:1}
+.tb-time.placeholder{color:var(--border-mid);font-size:1.3rem}
+.tb-duration{font-size:.74rem;color:var(--emerald);font-weight:600;margin-top:4px}
+
+.checkin-actions{display:flex;gap:10px;flex-wrap:wrap}
+.ci-btn{padding:11px 24px;border-radius:11px;font-family:'DM Sans',sans-serif;font-weight:700;font-size:.88rem;cursor:pointer;border:2px solid;transition:all .22s;display:flex;align-items:center;gap:7px}
+.ci-btn:disabled{opacity:.4;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.btn-checkin{background:rgba(5,150,105,.1);border-color:rgba(5,150,105,.3);color:var(--emerald)}
+.btn-checkin:hover:not(:disabled){background:var(--emerald);color:#fff;border-color:var(--emerald);box-shadow:0 4px 14px rgba(5,150,105,.3);transform:translateY(-2px)}
+.btn-checkout{background:rgba(37,99,235,.1);border-color:rgba(37,99,235,.25);color:var(--blue)}
+.btn-checkout:hover:not(:disabled){background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 4px 14px rgba(37,99,235,.28);transform:translateY(-2px)}
+.btn-absent{background:var(--red-bg);border-color:rgba(220,38,38,.22);color:var(--red)}
+.btn-absent:hover:not(:disabled){background:var(--red);color:#fff;border-color:var(--red);box-shadow:0 4px 14px rgba(220,38,38,.26);transform:translateY(-2px)}
+
+/* ── STREAKS TRACK ── */
+.streaks-section{margin-bottom:20px;animation:fadeUp .55s .12s ease both}
+.streaks-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px}
+.streaks-title{font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--text-soft);display:flex;align-items:center;gap:8px}
+.streaks-hint{font-size:.7rem;color:var(--text-soft);font-weight:500;letter-spacing:0;text-transform:none;opacity:.8}
+.streak-chip{font-size:.82rem;font-weight:700;color:var(--saffron);background:var(--saffron-light);border:1.5px solid rgba(249,115,22,.22);padding:5px 13px;border-radius:20px}
+
+.streaks-outer{position:relative}
+.streaks-outer::before{content:'';position:absolute;top:0;bottom:0;left:0;width:32px;background:linear-gradient(90deg,var(--bg),transparent);z-index:2;pointer-events:none;border-radius:var(--radius) 0 0 var(--radius)}
+.streaks-outer::after{content:'';position:absolute;top:0;bottom:0;right:0;width:32px;background:linear-gradient(-90deg,var(--bg),transparent);z-index:2;pointer-events:none}
+
+.streaks-track{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px 20px 14px;overflow-x:auto;scrollbar-width:none;display:flex;gap:6px;align-items:flex-end;scroll-behavior:smooth;box-shadow:var(--shadow)}
+.streaks-track::-webkit-scrollbar{display:none}
+
+/* individual day pill */
+.streak-day{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px}
+.streak-pip{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;border:1.5px solid transparent;transition:transform .18s;cursor:default}
+.streak-day:hover .streak-pip{transform:scale(1.12)}
+.streak-pip.sp-present{background:linear-gradient(135deg,#059669,#10B981);color:#fff;box-shadow:0 2px 7px rgba(5,150,105,.28)}
+.streak-pip.sp-absent{background:var(--red-bg);border-color:rgba(220,38,38,.22);color:var(--red)}
+.streak-pip.sp-holiday{background:var(--amber-bg);border-color:rgba(217,119,6,.2);color:var(--amber)}
+.streak-pip.sp-future{background:var(--bg2);border-color:var(--border);color:var(--border-mid)}
+.streak-pip.sp-today{outline:2px solid var(--navy);outline-offset:2px}
+.streak-date{font-size:.58rem;color:var(--text-soft);font-weight:600;line-height:1}
+.streak-hrs{font-size:.56rem;color:var(--emerald);font-weight:700;line-height:1}
+
+/* milestone marker */
+.streak-milestone{flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:3px}
+.ms-flag{border-radius:10px;padding:5px 8px;font-size:.62rem;font-weight:800;white-space:nowrap;text-align:center;line-height:1.25;box-shadow:0 3px 10px rgba(0,0,0,.15);margin-bottom:2px}
+.ms-bronze {background:linear-gradient(135deg,#D97706,#FBBF24);color:#fff}
+.ms-silver {background:linear-gradient(135deg,#6B7280,#D1D5DB);color:#111}
+.ms-gold   {background:linear-gradient(135deg,#D97706,#F59E0B);color:#fff}
+.ms-diamond{background:linear-gradient(135deg,#2563EB,#7C3AED);color:#fff}
+.ms-fire   {background:linear-gradient(135deg,#DC2626,#F97316);color:#fff}
+.ms-legend {background:linear-gradient(135deg,#7C3AED,#DB2777);color:#fff}
+.ms-connector{width:1.5px;height:8px;background:linear-gradient(180deg,rgba(249,115,22,.5),transparent);margin:0 auto}
+
+/* ── CALENDAR ── */
+.cal-card{background:var(--white);border:1.5px solid var(--border);border-radius:var(--radius);padding:26px;box-shadow:var(--shadow);margin-bottom:20px;animation:fadeUp .55s .16s ease both}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.cal-header-center{text-align:center}
+.cal-month-title{font-family:'Playfair Display',serif;font-size:1.45rem;color:var(--navy);margin-bottom:2px}
+.cal-month-summary{font-size:.75rem;color:var(--text-soft)}
+.cal-nav-btn{background:var(--bg2);border:1.5px solid var(--border);width:38px;height:38px;border-radius:10px;cursor:pointer;font-size:1rem;transition:all .2s;display:flex;align-items:center;justify-content:center;color:var(--navy)}
+.cal-nav-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+.cal-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--text-mid)}
+.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.ld-present{background:#059669}
+.ld-absent{background:#DC2626}
+.ld-holiday{background:#D97706}
+.ld-today{background:var(--navy)}
+.ld-future{background:var(--bg3);border:1.5px solid var(--border)}
+
+.day-headers{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:5px}
+.day-header{text-align:center;font-size:.67rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:5px 0;color:var(--text-soft)}
+
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal-day{border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:6px 3px 5px;cursor:default;transition:all .2s;position:relative;min-height:62px;gap:1px;overflow:hidden}
+.cal-day .day-num{font-size:.79rem;font-weight:700;line-height:1;margin-top:1px}
+.cal-day .day-hrs{font-size:.61rem;font-weight:800;line-height:1;margin-top:2px}
+.cal-day .day-ci{font-size:.53rem;line-height:1.1;opacity:.75}
+.cal-day .day-co{font-size:.53rem;line-height:1.1;opacity:.75}
+.cal-day.empty{background:transparent}
+.cal-day.future{background:var(--bg2)}
+.cal-day.future .day-num{color:var(--border-mid)}
+.cal-day.present{background:rgba(5,150,105,.1);border:1.5px solid rgba(5,150,105,.25);cursor:pointer}
+.cal-day.present .day-num{color:#059669}
+.cal-day.present .day-hrs{color:var(--emerald)}
+.cal-day.present .day-ci,.cal-day.present .day-co{color:rgba(5,150,105,.8)}
+.cal-day.present:hover{background:rgba(5,150,105,.17);transform:scale(1.04)}
+.cal-day.absent{background:rgba(220,38,38,.08);border:1.5px solid rgba(220,38,38,.18)}
+.cal-day.absent .day-num{color:var(--red)}
+.cal-day.absent:hover{background:rgba(220,38,38,.14);transform:scale(1.04)}
+.cal-day.holiday{background:rgba(217,119,6,.09);border:1.5px solid rgba(217,119,6,.2)}
+.cal-day.holiday .day-num{color:var(--amber)}
+.cal-day.today{background:var(--navy)!important;box-shadow:0 4px 14px rgba(15,23,42,.26);border:none!important}
+.cal-day.today .day-num{color:#fff!important}
+.cal-day.today .day-hrs{color:rgba(255,255,255,.75)!important}
+.cal-day.today .day-ci,.cal-day.today .day-co{color:rgba(255,255,255,.6)!important}
+.cal-day.today.absent{background:#DC2626!important}
+
+/* TOOLTIP */
+.cal-day[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:.67rem;font-weight:600;padding:6px 12px;border-radius:9px;white-space:pre;pointer-events:none;z-index:40;line-height:1.55;text-align:left}
+.cal-day[data-tip]:hover::before{content:'';position:absolute;bottom:calc(100% + 4px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--navy);pointer-events:none;z-index:40}
+
+/* ── MOBILE NAV ── */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:300;background:var(--white);border-top:1.5px solid var(--border);padding:8px 0 6px}
+.mobile-nav-inner{display:flex;justify-content:space-around}
+.mn-item{display:flex;flex-direction:column;align-items:center;gap:3px;text-decoration:none;color:var(--text-soft);font-size:.68rem;font-weight:600;padding:4px 14px;border-radius:10px;transition:color .2s;position:relative}
+.mn-item.active{color:var(--saffron)}
+.mn-icon{font-size:1.25rem;line-height:1}
+.mn-notif-dot{position:absolute;top:0;right:8px;width:8px;height:8px;border-radius:50%;background:#EF4444;border:2px solid var(--white)}
+.mn-notif-dot.hidden{display:none}
+
+@keyframes fadeDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:900px){.hours-stats{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:720px){.nav-center{display:none}.mobile-nav{display:block}.container{padding-bottom:90px}.logout-btn{display:none}.user-name{display:none}}
+@media(max-width:560px){.hours-stats{grid-template-columns:repeat(2,1fr)}.checkin-times{flex-direction:column}.checkin-actions{flex-direction:column}.ci-btn{justify-content:center}}
+@media(max-width:440px){.navbar{padding:0 16px}.cal-day{min-height:50px}.cal-day .day-ci,.cal-day .day-co{display:none}}
+::-webkit-scrollbar{width:5px;height:4px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:rgba(249,115,22,.3);border-radius:10px}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="dashboard.html" class="nav-brand">Knowledge <em>Nook</em></a>
+  <div class="nav-center">
+    <a href="dashboard.html" class="nav-link">🏠 Dashboard</a>
+    <a href="membership.html" class="nav-link">💳 Membership</a>
+    <a href="attendance.html" class="nav-link active">📅 Attendance</a>
+  </div>
+  <div class="nav-right">
+    <a href="notifications.html" class="notif-btn" title="Notifications">
+      🔔<span class="notif-dot hidden" id="navNotifCount">0</span>
+    </a>
+    <div class="user-pill">
+      <div class="user-avatar" id="navAvatar">U</div>
+      <span class="user-name" id="navUserName">Student</span>
+      <span class="v-badge blue hidden" id="vBadgeBlue">✓</span>
+      <span class="v-badge amber hidden" id="vBadgeAmber">⏳</span>
+    </div>
+    <button class="logout-btn" onclick="logout()">Log Out</button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <!-- PAGE HEADER -->
+  <div class="page-hd">
+    <h1>📅 Attendance & Study Hours</h1>
+    <p>Track your check-ins, study hours, and streaks. Every hour counts. 📚</p>
+  </div>
+
+  <!-- HOURS STATS -->
+  <div class="hours-stats">
+    <div class="h-stat hs-total">
+      <div class="h-icon">🕐</div>
+      <div class="h-val" id="hTotalAll">—</div>
+      <div class="h-label">Total Hours All Time</div>
+    </div>
+    <div class="h-stat hs-month">
+      <div class="h-icon">📆</div>
+      <div class="h-val" id="hThisMonth">—</div>
+      <div class="h-label">Hours This Month</div>
+      <div class="h-sub" id="hMonthSub">of — purchased</div>
+    </div>
+    <div class="h-stat hs-week">
+      <div class="h-icon">📅</div>
+      <div class="h-val" id="hThisWeek">—</div>
+      <div class="h-label">Hours This Week</div>
+    </div>
+    <div class="h-stat hs-pct">
+      <div class="h-icon">🎯</div>
+      <div class="h-val" id="hPct">—%</div>
+      <div class="h-label">Studied vs Purchased</div>
+      <div class="h-bar"><div class="h-bar-fill" id="hBarFill" style="width:0%"></div></div>
+    </div>
+    <div class="h-stat hs-streak">
+      <div class="h-icon">🔥</div>
+      <div class="h-val" id="hStreak">—</div>
+      <div class="h-label">Current Streak</div>
+      <div class="h-sub" id="hStreakSub">days in a row</div>
+    </div>
+  </div>
+
+  <!-- TODAY CHECK-IN / CHECK-OUT -->
+  <div class="checkin-panel">
+    <div class="checkin-top">
+      <div>
+        <div class="today-label-sm">Today's Session</div>
+        <div class="today-date-big" id="todayDateBig">—</div>
+      </div>
+      <div id="todayMainChip">
+        <span class="today-status-chip tsc-none">⏳ Not Started</span>
+      </div>
+    </div>
+
+    <div class="checkin-times">
+      <div class="time-box" id="boxCheckIn">
+        <div class="tb-label"><span class="tb-dot green"></span>Check-In</div>
+        <div class="tb-time placeholder" id="dispCheckIn">--:--</div>
+      </div>
+      <div class="time-box" id="boxCheckOut">
+        <div class="tb-label"><span class="tb-dot blue"></span>Check-Out</div>
+        <div class="tb-time placeholder" id="dispCheckOut">--:--</div>
+        <div class="tb-duration hidden" id="dispDuration"></div>
+      </div>
+    </div>
+
+    <div class="checkin-actions">
+      <button class="ci-btn btn-checkin"  id="btnCheckIn"  onclick="doCheckIn()">🟢 Check In</button>
+      <button class="ci-btn btn-checkout" id="btnCheckOut" onclick="doCheckOut()" disabled>🔵 Check Out</button>
+      <button class="ci-btn btn-absent"   id="btnAbsent"   onclick="doMarkAbsent()">❌ Mark Absent</button>
+    </div>
+  </div>
+
+  <!-- STREAKS TRACK -->
+  <div class="streaks-section">
+    <div class="streaks-header">
+      <div class="streaks-title">
+        🏆 Study Streak History
+        <span class="streaks-hint">← scroll to see past days</span>
+      </div>
+      <div class="streak-chip" id="streakChip">🔥 0 day streak</div>
+    </div>
+    <div class="streaks-outer">
+      <div class="streaks-track" id="streakTrack"></div>
+    </div>
+  </div>
+
+  <!-- CALENDAR -->
+  <div class="cal-card">
+    <div class="cal-header">
+      <button class="cal-nav-btn" onclick="changeMonth(-1)">&#8592;</button>
+      <div class="cal-header-center">
+        <div class="cal-month-title" id="calMonthTitle">—</div>
+        <div class="cal-month-summary" id="calMonthSummary">—</div>
+      </div>
+      <button class="cal-nav-btn" onclick="changeMonth(1)">&#8594;</button>
+    </div>
+
+    <div class="cal-legend">
+      <div class="legend-item"><div class="legend-dot ld-present"></div>Present</div>
+      <div class="legend-item"><div class="legend-dot ld-absent"></div>Absent</div>
+      <div class="legend-item"><div class="legend-dot ld-holiday"></div>Holiday</div>
+      <div class="legend-item"><div class="legend-dot ld-today"></div>Today</div>
+      <div class="legend-item"><div class="legend-dot ld-future"></div>Future / Unmarked</div>
+    </div>
+
+    <div class="day-headers">
+      <div class="day-header" style="color:var(--saffron)">Sun</div>
+      <div class="day-header">Mon</div><div class="day-header">Tue</div>
+      <div class="day-header">Wed</div><div class="day-header">Thu</div>
+      <div class="day-header">Fri</div><div class="day-header">Sat</div>
+    </div>
+
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+
+</div>
+
+<!-- MOBILE BOTTOM NAV -->
+<div class="mobile-nav">
+  <div class="mobile-nav-inner">
+    <a href="dashboard.html" class="mn-item"><span class="mn-icon">🏠</span><span>Home</span></a>
+    <a href="membership.html" class="mn-item"><span class="mn-icon">💳</span><span>Plan</span></a>
+    <a href="attendance.html" class="mn-item active"><span class="mn-icon">📅</span><span>Attendance</span></a>
+    <a href="notifications.html" class="mn-item"><span class="mn-icon">🔔</span><span>Alerts</span><span class="mn-notif-dot hidden" id="mnDot"></span></a>
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════ */
+const scriptURL = 'https://script.google.com/macros/s/AKfycbyPbbY-KLAk0bdePtwIPCLIj6jMW9UzqQi-en_Y-ZcJrnoIyZ3jUh7OR4CAWb6YwN28/exec';
+const MONTHS    = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS_S    = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const REAL_TODAY = new Date();
+
+// Hours per plan (used for "studied vs purchased" percentage)
+const PLAN_MONTHLY_HRS = { basic:156, fundamental:156, standard:312, professional:442 };
+
+let viewYear  = REAL_TODAY.getFullYear();
+let viewMonth = REAL_TODAY.getMonth();
+
+/* ═══════════════════════════════════════════
+   STORAGE HELPERS
+═══════════════════════════════════════════ */
+const getAtt  = ()    => JSON.parse(localStorage.getItem('kn_attendance') || '{}');
+const saveAtt = data  => localStorage.setItem('kn_attendance', JSON.stringify(data));
+const dateKey = (y,m,d) => `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+const todayKey = () => dateKey(REAL_TODAY.getFullYear(), REAL_TODAY.getMonth(), REAL_TODAY.getDate());
+
+const getPlan = () => (localStorage.getItem('kn_user_plan') || 'standard').toLowerCase();
+
+/* ═══════════════════════════════════════════
+   FORMAT HELPERS
+═══════════════════════════════════════════ */
+function fmtTime(ts){
+  if(!ts) return null;
+  return new Date(ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit',hour12:true});
+}
+function fmtHrs(h){
+  if(h === null || isNaN(h) || h <= 0) return '0h';
+  const hrs = Math.floor(h), mins = Math.round((h-hrs)*60);
+  if(hrs===0) return `${mins}m`;
+  if(mins===0) return `${hrs}h`;
+  return `${hrs}h ${mins}m`;
+}
+function hrsDiff(a,b){ return Math.max(0,(b-a)/3600000); }
+
+function getDayHours(rec){
+  if(!rec || (typeof rec==='string' ? rec : rec.status) !== 'present') return 0;
+  if(typeof rec === 'object'){
+    if(rec.hours > 0) return rec.hours;
+    if(rec.checkIn && rec.checkOut) return hrsDiff(rec.checkIn, rec.checkOut);
+  }
+  return 0;
+}
+function getDayStatus(rec){
+  if(!rec) return null;
+  return typeof rec === 'string' ? rec : rec.status;
+}
+
+/* ═══════════════════════════════════════════
+   CHECK-IN / CHECK-OUT
+═══════════════════════════════════════════ */
+function getSession(){ return JSON.parse(localStorage.getItem('kn_session_today') || '{}'); }
+function saveSession(d){ localStorage.setItem('kn_session_today', JSON.stringify(d)); }
+
+function doCheckIn(){
+  const att = getAtt(), key = todayKey(), now = Date.now();
+  att[key] = { status:'present', checkIn:now, checkOut:null, hours:0 };
+  saveAtt(att);
+  saveSession({ date:key, checkIn:now, checkOut:null });
+  renderAll();
+  syncDB(key,'present',fmtTime(now),null,0);
+}
+
+function doCheckOut(){
+  const sess = getSession();
+  if(!sess.checkIn) return;
+  const att = getAtt(), key = todayKey(), now = Date.now();
+  const hrs = hrsDiff(sess.checkIn, now);
+  const dayRec = att[key] || {};
+  dayRec.checkOut = now; dayRec.hours = hrs;
+  att[key] = dayRec;
+  saveAtt(att);
+  sess.checkOut = now; sess.hours = hrs;
+  saveSession(sess);
+  renderAll();
+  syncDB(key,'present',fmtTime(sess.checkIn),fmtTime(now),hrs);
+}
+
+function doMarkAbsent(){
+  const att = getAtt(), key = todayKey();
+  att[key] = { status:'absent', checkIn:null, checkOut:null, hours:0 };
+  saveAtt(att);
+  localStorage.removeItem('kn_session_today');
+  renderAll();
+  syncDB(key,'absent',null,null,0);
+}
+
+/* ═══════════════════════════════════════════
+   RENDER TODAY PANEL
+═══════════════════════════════════════════ */
+function renderTodayPanel(){
+  const att  = getAtt(), key = todayKey(), rec = att[key] || {};
+  const sess = getSession();
+
+  document.getElementById('todayDateBig').textContent =
+    REAL_TODAY.toLocaleDateString('en-IN',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  const chip  = document.getElementById('todayMainChip');
+  const ci    = document.getElementById('dispCheckIn');
+  const co    = document.getElementById('dispCheckOut');
+  const dur   = document.getElementById('dispDuration');
+  const bCI   = document.getElementById('btnCheckIn');
+  const bCO   = document.getElementById('btnCheckOut');
+  const bAb   = document.getElementById('btnAbsent');
+  const bxCI  = document.getElementById('boxCheckIn');
+  const bxCO  = document.getElementById('boxCheckOut');
+
+  function reset(){ bxCI.className='time-box'; bxCO.className='time-box'; dur.classList.add('hidden'); }
+
+  const st = getDayStatus(rec);
+  if(st==='absent'){
+    chip.innerHTML=`<span class="today-status-chip tsc-absent">❌ Absent Today</span>`;
+    ci.textContent='—'; ci.className='tb-time placeholder';
+    co.textContent='—'; co.className='tb-time placeholder';
+    reset(); bCI.disabled=true; bCO.disabled=true; bAb.disabled=true;
+  } else if(st==='present' && sess.checkIn && !sess.checkOut){
+    chip.innerHTML=`<span class="today-status-chip tsc-in"><span class="pulsedot"></span> Studying Now</span>`;
+    ci.textContent=fmtTime(sess.checkIn); ci.className='tb-time';
+    co.textContent='--:--'; co.className='tb-time placeholder';
+    reset(); bxCI.classList.add('active');
+    dur.classList.add('hidden'); bCI.disabled=true; bCO.disabled=false; bAb.disabled=true;
+  } else if(st==='present' && sess.checkIn && sess.checkOut){
+    const hrs = sess.hours || hrsDiff(sess.checkIn,sess.checkOut);
+    chip.innerHTML=`<span class="today-status-chip tsc-done">✅ Done · ${fmtHrs(hrs)}</span>`;
+    ci.textContent=fmtTime(sess.checkIn); ci.className='tb-time';
+    co.textContent=fmtTime(sess.checkOut); co.className='tb-time';
+    reset(); bxCI.classList.add('done'); bxCO.classList.add('done');
+    dur.textContent=`Session: ${fmtHrs(hrs)}`; dur.classList.remove('hidden');
+    bCI.disabled=true; bCO.disabled=true; bAb.disabled=true;
+  } else {
+    chip.innerHTML=`<span class="today-status-chip tsc-none">⏳ Not Started</span>`;
+    ci.textContent='--:--'; ci.className='tb-time placeholder';
+    co.textContent='--:--'; co.className='tb-time placeholder';
+    reset(); bCI.disabled=false; bCO.disabled=true; bAb.disabled=false;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   HOURS STATS
+═══════════════════════════════════════════ */
+function renderHoursStats(){
+  const att     = getAtt();
+  const plan    = getPlan();
+  const mBought = PLAN_MONTHLY_HRS[plan] || 312;
+
+  const now = REAL_TODAY, yr = now.getFullYear(), mo = now.getMonth();
+  // Week: Mon-based
+  const dow = now.getDay();
+  const wkStart = new Date(now); wkStart.setDate(now.getDate()-((dow+6)%7)); wkStart.setHours(0,0,0,0);
+
+  let totalAll=0, monthH=0, weekH=0;
+  for(const [key,rec] of Object.entries(att)){
+    const h = getDayHours(rec);
+    if(!h) continue;
+    totalAll += h;
+    const d = new Date(key);
+    if(d.getFullYear()===yr && d.getMonth()===mo) monthH+=h;
+    if(d>=wkStart) weekH+=h;
+  }
+
+  const pct = Math.min(100, Math.round((monthH/mBought)*100));
+  document.getElementById('hTotalAll').textContent  = fmtHrs(totalAll);
+  document.getElementById('hThisMonth').textContent = fmtHrs(monthH);
+  document.getElementById('hMonthSub').textContent  = `of ${mBought}h purchased`;
+  document.getElementById('hThisWeek').textContent  = fmtHrs(weekH);
+  document.getElementById('hPct').textContent       = pct + '%';
+  document.getElementById('hBarFill').style.width   = pct + '%';
+
+  const streak = computeStreak();
+  document.getElementById('hStreak').textContent     = streak;
+  document.getElementById('hStreakSub').textContent  = streak===1 ? 'day in a row' : 'days in a row';
+}
+
+/* ═══════════════════════════════════════════
+   STREAK CALCULATION
+═══════════════════════════════════════════ */
+function computeStreak(){
+  const att = getAtt();
+  const cur = new Date(REAL_TODAY); cur.setHours(0,0,0,0);
+  let streak=0, c=new Date(cur);
+  for(let i=0;i<500;i++){
+    const k  = dateKey(c.getFullYear(),c.getMonth(),c.getDate());
+    const st = getDayStatus(att[k]);
+    if(st==='present')      streak++;
+    else if(st==='holiday') { /* neutral */ }
+    else break;
+    c.setDate(c.getDate()-1);
+  }
+  return streak;
+}
+
+/* ═══════════════════════════════════════════
+   MILESTONES
+═══════════════════════════════════════════ */
+const MILESTONES = [
+  {days:1,   emoji:'🌱', label:'First Day!',   cls:'ms-bronze',  title:'Spark Ignited'},
+  {days:3,   emoji:'☀️',  label:'3-Day Start',  cls:'ms-bronze',  title:'Getting Warm'},
+  {days:7,   emoji:'⚡',  label:'1 Week!',      cls:'ms-silver',  title:'Week Warrior'},
+  {days:14,  emoji:'💪',  label:'14 Days',      cls:'ms-silver',  title:'Fortnight Pro'},
+  {days:21,  emoji:'🥇',  label:'21 Days!',     cls:'ms-gold',    title:'3-Week Grind'},
+  {days:30,  emoji:'🏆',  label:'1 Month!',     cls:'ms-gold',    title:'Month Master'},
+  {days:50,  emoji:'💎',  label:'50 Days!',     cls:'ms-diamond', title:'Diamond Mind'},
+  {days:60,  emoji:'🔥',  label:'60 Days',      cls:'ms-fire',    title:'60-Day Fire'},
+  {days:75,  emoji:'🚀',  label:'75 Days!',     cls:'ms-fire',    title:'Three-Quarter'},
+  {days:90,  emoji:'🌟',  label:'90 Days!',     cls:'ms-fire',    title:'Ninety Nerd'},
+  {days:100, emoji:'⭐',  label:'100 Days!!',   cls:'ms-legend',  title:'Century Champ'},
+  {days:150, emoji:'👑',  label:'150 Days!',    cls:'ms-legend',  title:'Royalty'},
+  {days:200, emoji:'🎓',  label:'200 Days!!',   cls:'ms-legend',  title:'Scholar Elite'},
+  {days:365, emoji:'🏛️',  label:'1 FULL YEAR!', cls:'ms-legend',  title:'Library Legend'},
+];
+
+/* ═══════════════════════════════════════════
+   RENDER STREAKS TRACK  (last 60 days)
+═══════════════════════════════════════════ */
+function renderStreaks(){
+  const att    = getAtt();
+  const streak = computeStreak();
+  document.getElementById('streakChip').textContent =
+    streak > 0 ? `🔥 ${streak}-day streak` : '😴 No active streak';
+
+  const track   = document.getElementById('streakTrack');
+  const today0  = new Date(REAL_TODAY); today0.setHours(0,0,0,0);
+  const NDAYS   = 60;
+
+  // Build ordered days oldest → newest
+  let days = [];
+  for(let i=NDAYS-1; i>=0; i--){
+    const d=new Date(today0); d.setDate(today0.getDate()-i); days.push(d);
+  }
+
+  // Compute rolling streak count per day
+  let runCount = 0;
+  let html = '';
+
+  days.forEach(d => {
+    const key    = dateKey(d.getFullYear(),d.getMonth(),d.getDate());
+    const rec    = att[key];
+    const st     = getDayStatus(rec);
+    const hrs    = getDayHours(rec);
+    const isFut  = d > today0;
+    const isToday= key === todayKey();
+
+    if(st==='present')      runCount++;
+    else if(st==='holiday') { /* neutral – don't break or increment */ }
+    else                    runCount=0;
+
+    // Check milestone at this exact count
+    const ms = MILESTONES.find(m => m.days === runCount && st==='present');
+
+    // pip class
+    let pc='streak-pip';
+    let content=d.getDate();
+    if(isFut)             pc+=' sp-future';
+    else if(st==='present')pc+=' sp-present';
+    else if(st==='absent') pc+=' sp-absent';
+    else if(st==='holiday'){pc+=' sp-holiday'; content='🎉';}
+    else                   pc+=' sp-future';
+    if(isToday) pc+=' sp-today';
+
+    const statusLabel = isFut ? 'Future' : (st ? st.charAt(0).toUpperCase()+st.slice(1) : 'Unmarked');
+    const tipDate = d.toLocaleDateString('en-IN',{month:'short',day:'numeric'});
+    const hrsTip  = hrs>0 ? ` · ${fmtHrs(hrs)}` : '';
+    const tipStr  = `${tipDate} — ${statusLabel}${hrsTip}`;
+
+    if(ms){
+      html += `<div class="streak-milestone">
+        <div class="ms-flag ${ms.cls}" title="${ms.title}">${ms.emoji} ${ms.label}</div>
+        <div class="ms-connector"></div>
+        <div class="${pc}" title="${tipStr}">${content}</div>
+        <div class="streak-date">${DAYS_S[d.getDay()]}</div>
+        ${hrs>0?`<div class="streak-hrs">${fmtHrs(hrs)}</div>`:'<div class="streak-hrs"></div>'}
+      </div>`;
+    } else {
+      html += `<div class="streak-day">
+        <div class="${pc}" title="${tipStr}">${content}</div>
+        <div class="streak-date">${DAYS_S[d.getDay()]}</div>
+        ${hrs>0?`<div class="streak-hrs">${fmtHrs(hrs)}</div>`:'<div class="streak-hrs"></div>'}
+      </div>`;
+    }
+  });
+
+  track.innerHTML = html;
+  // scroll to rightmost (today)
+  requestAnimationFrame(() => { track.scrollLeft = track.scrollWidth; });
+}
+
+/* ═══════════════════════════════════════════
+   RENDER CALENDAR
+═══════════════════════════════════════════ */
+function renderCalendar(){
+  const att   = getAtt();
+  const grid  = document.getElementById('calGrid');
+  const year  = viewYear, month = viewMonth;
+  const tKey  = todayKey();
+  const today0= new Date(REAL_TODAY); today0.setHours(0,0,0,0);
+
+  document.getElementById('calMonthTitle').textContent = `${MONTHS[month]} ${year}`;
+
+  // Month stats
+  const daysInMonth = new Date(year,month+1,0).getDate();
+  let mPresent=0,mAbsent=0,mHours=0;
+  for(let d=1;d<=daysInMonth;d++){
+    const k=dateKey(year,month,d), rc=att[k];
+    const st=getDayStatus(rc);
+    if(st==='present'){ mPresent++; mHours+=getDayHours(rc); }
+    else if(st==='absent') mAbsent++;
+  }
+  document.getElementById('calMonthSummary').textContent =
+    `${mPresent} present · ${mAbsent} absent · ${fmtHrs(mHours)} studied`;
+
+  const firstDay = new Date(year,month,1).getDay();
+  let html='';
+  for(let i=0;i<firstDay;i++) html+='<div class="cal-day empty"></div>';
+
+  for(let d=1;d<=daysInMonth;d++){
+    const key  = dateKey(year,month,d);
+    const rec  = att[key];
+    const st   = getDayStatus(rec);
+    const hrs  = getDayHours(rec);
+    const ciTs = rec && typeof rec==='object' ? rec.checkIn  : null;
+    const coTs = rec && typeof rec==='object' ? rec.checkOut : null;
+    const ciStr= ciTs ? fmtTime(ciTs) : null;
+    const coStr= coTs ? fmtTime(coTs) : null;
+
+    const iterD = new Date(year,month,d); iterD.setHours(0,0,0,0);
+    const isFuture = iterD > today0;
+    const isToday  = key === tKey;
+
+    let cls='cal-day';
+    let tipLines=[`${d} ${MONTHS[month]}`];
+
+    if(isFuture)          cls+=' future';
+    else if(st==='present'){
+      cls+=' present';
+      tipLines.push('✅ Present');
+      if(ciStr) tipLines.push(`▶ In:  ${ciStr}`);
+      if(coStr) tipLines.push(`■ Out: ${coStr}`);
+      if(hrs>0) tipLines.push(`⏱ ${fmtHrs(hrs)} studied`);
+    } else if(st==='absent') { cls+=' absent'; tipLines.push('❌ Absent'); }
+    else if(st==='holiday'){ cls+=' holiday'; tipLines.push('🎉 Holiday'); }
+    else                   { cls+=' future'; tipLines.push('Unmarked'); }
+    if(isToday) cls+=' today';
+
+    const hrsHtml= hrs>0 ? `<div class="day-hrs">${fmtHrs(hrs)}</div>` : '';
+    const ciHtml = ciStr ? `<div class="day-ci">▶${ciStr}</div>` : '';
+    const coHtml = coStr ? `<div class="day-co">■${coStr}</div>` : '';
+
+    html+=`<div class="${cls}" data-tip="${tipLines.join('\n')}">
+      <div class="day-num">${d}</div>${hrsHtml}${ciHtml}${coHtml}
+    </div>`;
+  }
+  grid.innerHTML=html;
+}
+
+function changeMonth(dir){
+  viewMonth+=dir;
+  if(viewMonth<0){ viewMonth=11; viewYear--; }
+  if(viewMonth>11){ viewMonth=0; viewYear++; }
+  renderCalendar();
+}
+
+/* ═══════════════════════════════════════════
+   DB SYNC
+═══════════════════════════════════════════ */
+function syncDB(date,status,checkIn,checkOut,hours){
+  const email=localStorage.getItem('kn_user_email');
+  if(!email) return;
+  const fd=new FormData();
+  fd.append('action','mark_attendance');
+  fd.append('email',email);
+  fd.append('date',date);
+  fd.append('status',status);
+  if(checkIn)  fd.append('checkIn',checkIn);
+  if(checkOut) fd.append('checkOut',checkOut);
+  fd.append('hours',Number(hours).toFixed(2));
+  fetch(scriptURL,{method:'POST',body:fd}).catch(()=>{});
+}
+
+function fetchFromDB(email){
+  const fd=new FormData();
+  fd.append('action','get_attendance');
+  fd.append('email',email);
+  fetch(scriptURL,{method:'POST',body:fd})
+    .then(r=>r.json())
+    .then(data=>{ if(data.result==='success'){ saveAtt(data.data); renderAll(); } })
+    .catch(()=>{});
+}
+
+/* ═══════════════════════════════════════════
+   DEMO DATA SEED
+═══════════════════════════════════════════ */
+function seedDemo(){
+  if(localStorage.getItem('kn_attendance')) return;
+  const att={};
+  const yr=REAL_TODAY.getFullYear(), mo=REAL_TODAY.getMonth();
+  const patterns=['present','present','present','present','absent','present','present','present','present','present','holiday','present','present','present','absent','present','present','present'];
+  let pi=0;
+  // Previous month last 15 days
+  const pm=mo===0?11:mo-1, py=mo===0?yr-1:yr;
+  const pdim=new Date(py,pm+1,0).getDate();
+  for(let d=pdim-14;d<=pdim;d++){
+    const k=dateKey(py,pm,d);
+    const st=patterns[pi++%patterns.length];
+    const h=st==='present'?4+Math.random()*6:0;
+    const ci=st==='present'?new Date(py,pm,d,7+Math.floor(Math.random()*3)).getTime():null;
+    att[k]={status:st,checkIn:ci,checkOut:ci?ci+h*3600000:null,hours:h};
+  }
+  // Current month up to yesterday
+  for(let d=1;d<REAL_TODAY.getDate();d++){
+    const k=dateKey(yr,mo,d);
+    const st=patterns[pi++%patterns.length];
+    const h=st==='present'?4+Math.random()*7:0;
+    const ci=st==='present'?new Date(yr,mo,d,7+Math.floor(Math.random()*3)).getTime():null;
+    att[k]={status:st,checkIn:ci,checkOut:ci?ci+h*3600000:null,hours:h};
+  }
+  saveAtt(att);
+}
+
+/* ═══════════════════════════════════════════
+   BADGES & NOTIFS
+═══════════════════════════════════════════ */
+function updateBadges(){
+  const s=localStorage.getItem('kn_user_status')||'new';
+  document.getElementById('vBadgeBlue').classList.toggle('hidden',s!=='Verified');
+  document.getElementById('vBadgeAmber').classList.toggle('hidden',s!=='Pending Verification');
+}
+
+function renderAll(){
+  renderTodayPanel();
+  renderHoursStats();
+  renderStreaks();
+  renderCalendar();
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+window.onload = function() {
+  const userName = localStorage.getItem('kn_user_name');
+  const email = localStorage.getItem('kn_user_email');
+  
+  if (!userName || !email) { 
+    window.location.href = 'login.html'; 
+    return; 
+  }
+
+  document.getElementById('navAvatar').textContent = userName.charAt(0).toUpperCase();
+  document.getElementById('navUserName').textContent = userName.split(' ')[0];
+  
+  updateBadges();
+
+  // ONLY seed demo data if there is absolutely no history AND no email 
+  // (Usually, we skip seedDemo once the app is live)
+  // seedDemo(); 
+
+  // Initial render (shows whatever we have locally)
+  renderAll();
+
+  // CRITICAL: Immediately fetch the latest from the Google Sheet
+  fetchFromDB(email);
+
+  // Stale session check (from previous day)
+  const sess = getSession();
+  if (sess.date && sess.date !== todayKey()) {
+    localStorage.removeItem('kn_session_today');
+  }
+};
+function logout(){ localStorage.clear(); window.location.href='login.html'; }
+</script>
+</body>
+</html>
